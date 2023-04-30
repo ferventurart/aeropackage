@@ -55,7 +55,7 @@ public class UpdatePackageCommandHandler : IRequestHandler<UpdatePackageCommand,
             return Errors.User.NotFound;
         }
 
-        if (command.CourierTrackingNumber != package.CourierTrackingNumber)
+        if (!string.IsNullOrEmpty(command.CourierTrackingNumber) && !string.IsNullOrEmpty(package.CourierTrackingNumber) && command.CourierTrackingNumber != package.CourierTrackingNumber)
         {
             var exitingPackage = _packageRepository.GetPackageByTrackingNumber(command.CourierTrackingNumber);
 

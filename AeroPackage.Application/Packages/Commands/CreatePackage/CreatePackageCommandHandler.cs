@@ -53,25 +53,25 @@ public class CreatePackageCommandHandler : IRequestHandler<CreatePackageCommand,
             return Errors.User.NotFound;
         }
         
-        if (command.CourierTrackingNumber is not null && _packageRepository.ExistsWithTrackingNumber(command.CourierTrackingNumber))
+        if (!string.IsNullOrEmpty(command.CourierTrackingNumber) && _packageRepository.ExistsWithTrackingNumber(command.CourierTrackingNumber))
         {
             return Errors.Package.DuplicateCourierTrackingNumber;
         }
 
         var package = Package.Create(
-                packageId,
-                ownTrackingNumber,
-                userId,
-                customerId,
-                customer.GetCustomerFullName(),
-                command.Store,
-                command.Courier,
-                command.CourierTrackingNumber,
-                command.Weight,
-                command.QuantityArticles,
-                command.Description,
-                command.DeclaredValue,
-                PackageStatus.PreAlert);
+            packageId,
+            ownTrackingNumber,
+            userId,
+            customerId,
+            customer.GetCustomerFullName(),
+            command.Store,
+            command.Courier,
+            command.CourierTrackingNumber,
+            command.Weight,
+            command.QuantityArticles,
+            command.Description,
+            command.DeclaredValue,
+            null);
 
         if(command.Attachments.Count > 0)
         {

@@ -88,11 +88,11 @@ public sealed class Package : AggregateRoot<PackageId, int>
         int quantityArticles,
         string description,
         decimal declaredValue,
-        PackageStatus status,
         List<PackageHistory>? packageHistories = null)
     {
         
-        return new Package(packageId,
+        return new Package(
+            packageId,
             ownTrackingNumber,
             userId,
             customerId,
@@ -105,7 +105,7 @@ public sealed class Package : AggregateRoot<PackageId, int>
             description,
             declaredValue,
             CalcualateTax(declaredValue),
-            status,
+            PackageStatus.PreAlert,
             packageHistories ?? new());
     }
 
