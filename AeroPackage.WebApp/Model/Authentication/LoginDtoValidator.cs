@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using FluentValidation;
 
 namespace AeroPackage.WebApp.Model.Authentication;
@@ -7,6 +8,8 @@ public class LoginDtoValidator : AbstractValidator<LoginDto>
 {
     public LoginDtoValidator()
     {
+        ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("es-MX");
+
         RuleFor(x => x.Email)
             .EmailAddress().WithMessage("Debe ingresar un email valido.")
             .NotEmpty().WithMessage("El email es un campo requerido.");

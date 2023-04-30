@@ -4,6 +4,7 @@
 @using AeroPackage.WebApp.Model.Common;
 @using AeroPackage.WebApp.Extensions;
 @using AeroPackage.WebApp.Providers.Interfaces;
+@using AeroPackage.WebApp.Components.Package;
 @using Mapster
 @using System.Globalization;
 @using Microsoft.Extensions.Configuration
@@ -155,104 +156,20 @@
                     <MudItem xs="12" sm="6">
                         <MudText Typo="Typo.subtitle1" Class="ml-2" Color="Color.Info">Historial</MudText>
                         <br />
-                        <MudTimeline TimelinePosition="TimelinePosition.Start">
-                            <MudTimelineItem>
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Registrado</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:10</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem Color="Color.Info" TimelineAlign="TimelineAlign.End">
-                                <MudCard Elevation="25" Class="d-flex mud-width-full">
-                                    <MudCardContent>
-                                        <MudText Typo="Typo.subtitle1" Style="font-weight: bold">Recibido en USA</MudText>
-                                        <MudText Typo="Typo.body2">Yesterday: 16:33</MudText>
-                                    </MudCardContent>
-                                </MudCard>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Preparando para Env&iacute;o</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">En Transito a Pa&iacute;s Destino</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Recibido en Pa&iacute;s Destino</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Procesandose en Aduana</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Liberado en Aduanas</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Almacenado en Bodega ESA</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold"> Entregado a Transportista Local</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Entregado</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Today: 17:00</MudText>
-                            </MudTimelineItem>
-                        </MudTimeline>
+                        @if (model is not null)
+                        {
+                            <PackageTimeLine PackageHistories="model.PackageHistories" />
+                        }
                     </MudItem>
                 </MudHidden>
                 <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
                     <MudItem xs="12" sm="6">
                         <MudText Typo="Typo.subtitle1" Class="ml-2" Color="Color.Info">Historial</MudText>
                         <br />
-                        <MudTimeline TimelinePosition="TimelinePosition.Start">
-                            <MudTimelineItem>
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Registrado</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:10</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem Color="Color.Info" TimelineAlign="TimelineAlign.End">
-                                <MudCard Elevation="25" Class="d-flex mud-width-full">
-                                    <MudCardContent>
-                                        <MudText Typo="Typo.subtitle1" Style="font-weight: bold">Recibido en USA</MudText>
-                                        <MudText Typo="Typo.body2">Yesterday: 16:33</MudText>
-                                    </MudCardContent>
-                                </MudCard>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Preparando para Env&iacute;o</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">En Transito a Pa&iacute;s Destino</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Recibido en Pa&iacute;s Destino</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Procesandose en Aduana</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Liberado en Aduanas</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Almacenado en Bodega ESA</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold"> Entregado a Transportista Local</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
-                            </MudTimelineItem>
-                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
-                                <MudText Typo="Typo.body2" Style="font-weight: bold">Entregado</MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Today: 17:00</MudText>
-                            </MudTimelineItem>
-                        </MudTimeline>
+                        @if (model is not null)
+                        {
+                            <PackageTimeLine PackageHistories="model.PackageHistories" />
+                        }
                     </MudItem>
                 </MudHidden>
                 <MudItem xs="12" sm="12">
@@ -342,11 +259,12 @@
     PackageDto model = new PackageDto();
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-{
+    {
         new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
         new BreadcrumbItem("Paquetes", href: "/paquetes/buscar"),
         new BreadcrumbItem("Ver Paquete", href:null, disabled: true),
     };
+
     protected override async Task OnInitializedAsync()
     {
         try

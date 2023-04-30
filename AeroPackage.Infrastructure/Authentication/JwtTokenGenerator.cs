@@ -33,7 +33,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
                 new Claim("id", user.Id.Value.ToString()),
                 new Claim("role", user.Role.Name)
             }),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+            Expires = _dateTimeProvider.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
             IssuedAt = _dateTimeProvider.UtcNow,

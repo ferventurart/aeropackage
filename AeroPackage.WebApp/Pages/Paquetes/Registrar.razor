@@ -145,17 +145,16 @@
                                                  AdornmentColor="Color.Primary" />
                             </MudItem>
                             <MudItem xs="6">
-                                <MudNumericField @bind-Value="model.TaxValue"
-                                                 Label="Valor por Aduana"
-                                                 Step=".01M"
+                                <MudNumericField @bind-Value="model.QuantityArticles"
+                                                 Label="@("\u2116 de Articulos")"
+                                                 Min="1"
                                                  Class="mt-3"
                                                  Culture="@CultureInfo.GetCultureInfo("en-US")"
                                                  Variant="Variant.Text"
-                                                 For="@(() => model.TaxValue)"
-                                                 Format="N2"
+                                                 For="@(() => model.QuantityArticles)"
                                                  Immediate="false"
                                                  Adornment="Adornment.Start"
-                                                 AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                                                 AdornmentIcon="@Icons.Material.Filled.Numbers"
                                                  AdornmentColor="Color.Primary" />
                             </MudItem>
                         </MudGrid>

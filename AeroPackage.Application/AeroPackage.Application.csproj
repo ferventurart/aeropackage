@@ -30,7 +30,6 @@
     <None Remove="Packages\" />
     <None Remove="Packages\Commands\" />
     <None Remove="Packages\Commands\CreatePackage\" />
-    <None Remove="Packages\Commands\UpdatePackage\" />
     <None Remove="Packages\Queries\" />
     <None Remove="Packages\Queries\GetPackagesByCustomer\" />
     <None Remove="Authentication\Queries\Verify\" />
@@ -62,7 +61,6 @@
     <Folder Include="Packages\" />
     <Folder Include="Packages\Commands\" />
     <Folder Include="Packages\Commands\CreatePackage\" />
-    <Folder Include="Packages\Commands\UpdatePackage\" />
     <Folder Include="Packages\Queries\" />
     <Folder Include="Packages\Queries\GetPackagesByCustomer\" />
     <Folder Include="Authentication\Queries\Verify\" />

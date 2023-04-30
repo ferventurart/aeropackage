@@ -17,6 +17,6 @@ public class PackageDto
     public decimal? TaxValue { get; set; }
     public string CreatedBy { get; set; }
     public List<string> Attachments { get; set; }
-    public List<PackageTimeLineDto> TimeLines { get; set; }
+    public List<PackageHistoryDto> PackageHistories { get; set; }
 }
 

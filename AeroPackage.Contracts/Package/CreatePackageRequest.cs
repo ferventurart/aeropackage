@@ -13,6 +13,5 @@ public record CreatePackageRequest(
     int QuantityArticles,
     string Description,
     decimal DeclaredValue,
-    decimal? TaxValue,
     List<IFormFile>? Attachments);
 

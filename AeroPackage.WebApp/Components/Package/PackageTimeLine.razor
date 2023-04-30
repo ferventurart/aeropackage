@@ -1,0 +1,57 @@
+﻿@using AeroPackage.WebApp.Model.Package
+@using AeroPackage.WebApp.Extensions;
+
+<MudTimeline TimelinePosition="TimelinePosition.Start">
+
+    @if (PackageHistories is not null && PackageHistories.Count > 0)
+    {
+        var timeLineOrder = PackageHistories.OrderBy(s => s.DateMovement).ToList();
+
+        foreach (var item in timeLineOrder)
+        {
+            var lastUpdate = timeLineOrder.Last();
+
+            if (lastUpdate.Id == item.Id)
+            {
+                <MudTimelineItem Size="Size.Small" Color="@(item.Status == "Delivered" ? Color.Success : Color.Info)" Elevation="25">
+                    <MudCard Elevation="25">
+                        <MudCardContent>
+                            <MudText Typo="Typo.h6">@PackageStatusExtension.GetFormattedNameOfStatus(item.Status)</MudText>
+                            <MudText Typo="Typo.body2">@GetDateFormatted(item.DateMovement)</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudTimelineItem>
+            }
+            else
+            {
+                <MudTimelineItem>
+                    <MudText Typo="Typo.body2" Style="font-weight: bold">@PackageStatusExtension.GetFormattedNameOfStatus(item.Status)</MudText>
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">@GetDateFormatted(item.DateMovement)</MudText>
+                </MudTimelineItem>
+            }
+        }
+    }
+</MudTimeline>
+
+@code {
+
+    [Parameter]
+    public List<PackageHistoryDto> PackageHistories { get; set; }
+
+    private string GetDateFormatted(DateTime fecha)
+    {
+        if (fecha.Date == DateTime.Now.AddDays(-1).Date)
+        {
+            return "Ayer: " + fecha.ToString("HH:mm");
+        }
+        else if (fecha.Date == DateTime.Now.Date)
+        {
+            return "Ahora: " + fecha.ToString("HH:mm");
+        }
+        else
+        {
+            return fecha.ToString("dd/MM/yyyy HH:mm");
+        }
+    }
+}
+

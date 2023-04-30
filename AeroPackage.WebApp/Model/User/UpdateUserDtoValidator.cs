@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using FluentValidation;
 
 namespace AeroPackage.WebApp.Model.User;
@@ -7,6 +8,8 @@ public class UpdateUserDtoValidator :  AbstractValidator<UpdateUserDto>
 {
 	public UpdateUserDtoValidator()
     {
+        ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("es-MX");
+
         RuleFor(x => x.Id)
              .NotEmpty();
 

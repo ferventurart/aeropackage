@@ -33,7 +33,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Error
         user.UpdateProperty(c => c.Email, command.Email);
         user.UpdateProperty(c => c.Role, UserRole.FromValue(command.Role));
         user.UpdateProperty(c => c.Status, UserStatus.FromValue(command.Status));
-        user.UpdateProperty(c => c.UpdatedDateTime, DateTime.UtcNow);
+        user.UpdateProperty(c => c.UpdatedDateTime, DateTime.Now);
 
         _userRepository.Update(user);
 

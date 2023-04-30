@@ -38,7 +38,7 @@ public class UpdateCustomerCommandHandler : IRequestHandler<UpdateCustomerComman
         customer.UpdateProperty(c => c.Identification, NationalIdentification.Create(command.Identification));
         customer.UpdateProperty(c => c.Address, command.Address);
         customer.UpdateProperty(c => c.Status, CustomerStatus.FromValue(command.Status));
-        customer.UpdateProperty(c => c.UpdatedDateTime, DateTime.UtcNow);
+        customer.UpdateProperty(c => c.UpdatedDateTime, DateTime.Now);
 
         _customerRepository.Update(customer);
 

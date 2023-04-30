@@ -21,7 +21,7 @@ public sealed class PackageHistory : Entity<PackageHistoryId>
 
     public static PackageHistory Create(string status)
     {
-        return new PackageHistory(DateTime.UtcNow, status);
+        return new PackageHistory(DateTime.Now, status);
     }
 
     #pragma warning disable CS8618

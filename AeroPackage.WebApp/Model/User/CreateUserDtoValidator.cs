@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using AeroPackage.WebApp.Model.Authentication;
 using FluentValidation;
 
@@ -8,6 +9,8 @@ public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
 {
 	public CreateUserDtoValidator()
 	{
+        ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("es-MX");
+
         RuleFor(x => x.FirstName)
                .NotEmpty()
                .MaximumLength(100)

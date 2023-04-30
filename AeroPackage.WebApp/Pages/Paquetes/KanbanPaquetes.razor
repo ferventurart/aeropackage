@@ -6,12 +6,12 @@
 @using AeroPackage.WebApp.Model.Common;
 @using AeroPackage.WebApp.Extensions;
 @using System.Globalization;
-@using Mapster
+@using Mapster;
 @inject IPackageService _packageService
 @inject IDialogService DialogService
 @inject NavigationManager _navigationManager
 @attribute [Authorize(Roles = "Admin,Executive,Warehouse")]
-
+@inject ILogger<KanbanPaquetes> Logger
 <AuthorizeView>
     <Authorized>
         <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
@@ -39,7 +39,7 @@
                             <MultiSelectCommonStores StoresSelected="StoresSelectedCallback" />
                         </MudItem>
                         <MudItem xs="12">
-                            <MudButton OnClick="OnFilterPackages"
+                            <MudButton OnClick="@OnFilterPackages"
                                        Variant="Variant.Filled"
                                        EndIcon="@Icons.Material.Filled.Search"
                                        Color="Color.Primary"
@@ -52,35 +52,7 @@
             </MudExpansionPanel>
         </MudExpansionPanels>
 
-        <MudDropContainer T="DropPackageItemDto" Items="_dropItems"
-                          ItemsSelector="@((item,dropzone) => item.Status == dropzone)" ItemDropped="ItemUpdated"
-                          Class="d-flex flex-wrap">
-            <ChildContent>
-                @foreach (var status in PackageStatusExtension.GetCommonPackageStatus())
-                {
-                    <MudPaper Class="ma-4" Width="280px">
-                        <MudList Clickable="false" Class="mud-height-full">
-                            <MudDropZone T="DropPackageItemDto" Identifier="@(status.Value)" Class="mud-height-full">
-                                <MudListSubheader>
-                                    <img src="@status.Icon" height="24" width="24" style="vertical-align:middle" />
-                                    &nbsp;@status.Name
-                                </MudListSubheader>
-                            </MudDropZone>
-                        </MudList>
-                    </MudPaper>
-                }
-            </ChildContent>
-            <ItemRenderer Context="ItemDropRendered">
-                <MudListItem>
-                    <div class="mud-elevation-2 pa-2 rounded-lg mud-alert-text-warning">
-                        <MudIcon Icon="fa-solid fa-box"></MudIcon>&nbsp;
-                        <MudLink Target="_blank" Href="@($"/paquetes/ver/{ItemDropRendered.OwnTrackingNumber}")">@ItemDropRendered.OwnTrackingNumber</MudLink><br />
-                        &nbsp;<MudText Color="Color.Dark" Inline="true">@(ItemDropRendered.Description.Length > 15 ? ItemDropRendered.Description.Substring(0, 15) : ItemDropRendered.Description)</MudText><br />
-                        &nbsp;<MudText Style="font-weight: bold" Color="Color.Dark" Inline="true">@ItemDropRendered.Store</MudText>
-                    </div>
-                </MudListItem>
-            </ItemRenderer>
-        </MudDropContainer>
+        <DropZonePackageStatus Packages="@_packages"></DropZonePackageStatus>
 
     </Authorized>
     <NotAuthorized>
@@ -99,38 +71,35 @@
 
     private MudDateRangePicker _picker;
     private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+    private List<DropPackageItemDto> _packages = new();
     public string _packageStore { get; set; } = "Amazon";
-    private List<DropPackageItemDto> _dropItems = new();
     private bool disabledFilterButton = false;
-
-    private async Task GetPackages()
-    {
-        List<DragPackageResponse> packages = await _packageService.GetPackagesByPeriodAndStore(_dateRange.Start.Value, _dateRange.End.Value, _packageStore);
-        if (packages is not null && packages.Count > 0)
-        {
-            _dropItems = packages.Adapt<List<DropPackageItemDto>>();
-        }
-        else
-        {
-            Snackbar.Add("No se encontraron paquetes segun su criterio de busqueda.", MudBlazor.Severity.Warning);
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {
+        await OnFilterPackages();
+    }
+
+    private async Task OnFilterPackages()
+    {
         try
         {
-            await GetPackages();
+            List<DragPackageResponse> packages = await _packageService.GetPackagesByPeriodAndStore(_dateRange.Start.Value, _dateRange.End.Value, _packageStore);
+            if (packages is not null && packages.Count > 0)
+            {
+                _packages = packages.Adapt<List<DropPackageItemDto>>();
+            }
+            else
+            {
+                Snackbar.Add("No se encontraron paquetes segun su criterio de busqueda.", MudBlazor.Severity.Warning);
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            Snackbar.Add("Ocurrio un error al recuperar la informacion del cliente.", MudBlazor.Severity.Error);
-            _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+            Snackbar.Add("Ocurrio un error al recuperar los paquetes.", MudBlazor.Severity.Error);
         }
     }
-
-    private async Task OnFilterPackages() => await GetPackages();
 
     private void StoresSelectedCallback(List<string> stores)
     {

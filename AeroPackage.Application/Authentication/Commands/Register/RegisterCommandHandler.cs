@@ -38,7 +38,7 @@ public class RegisterCommandHandler :
         // 2. Create user (generate unique ID) & Persist to DB
         var user = User.Create(command.FirstName, command.LastName, command.Email, BC.HashPassword(command.Password), UserRole.Admin);
 
-        user.UpdateProperty(c => c.CreatedDateTime, DateTime.UtcNow);
+        user.UpdateProperty(c => c.CreatedDateTime, DateTime.Now);
 
         _userRepository.Add(user);
 

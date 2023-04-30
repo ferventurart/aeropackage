@@ -1,5 +1,4 @@
 ﻿using System;
-using AeroPackage.Application.Packages.Commands.UpdatePackage;
 using AeroPackage.Application.Packages.Commands.CreatePackage;
 using AeroPackage.Contracts.Package;
 using MapsterMapper;
@@ -79,27 +78,6 @@ public class PackagesController : ApiController
     }
 
     /// <summary>
-    /// Get all Packages of Customer
-    /// </summary>
-    /// <param name="Id"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="pageNumber"></param>
-    /// <param name="from"></param>
-    /// <param name="to"></param>
-    /// <returns></returns>
-    [HttpGet("customers")]
-    public async Task<IActionResult> GetPackagesOfCustomers(Guid id, DateTime from, DateTime to, int pageSize = 10, int pageNumber = 1)
-    {
-        var query = new GetPackageByCustomerQuery(id, from, to, pageSize, pageNumber);
-
-        var getPackageResult = await _mediator.Send(query);
-
-        return getPackageResult.Match(
-            packages => Ok(_mapper.Map<PaginatedResult<PackageResponse>>(packages)),
-            errors => Problem(errors));
-    }
-
-    /// <summary>
     /// Get Couries By Courier Tracking Number
     /// </summary>
     /// <param name="trackingNumber"></param>
@@ -160,7 +138,6 @@ public class PackagesController : ApiController
             request.QuantityArticles,
             request.Description,
             request.DeclaredValue,
-            request.TaxValue,
             attachmentsUrls);
 
         var createPackageResult = await _mediator.Send(command);
@@ -177,31 +154,6 @@ public class PackagesController : ApiController
         }
 
         return createPackageResult.Match(
-            customer => Ok(_mapper.Map<PackageResponse>(customer)),
-            errors => Problem(errors));
-    }
-
-    /// <summary>
-    /// Update Package
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdatePackageRequest request)
-    {
-        if (id != request.Id)
-        {
-            List<Error> errors = new();
-            errors.Add(Error.Validation("PackageId", "Url Id is not equal than Request Id."));
-            return Problem(errors);
-        }
-
-        var command = _mapper.Map<UpdatePackageCommand>((request));
-
-        var updatePackageResult = await _mediator.Send(command);
-
-        return updatePackageResult.Match(
             customer => Ok(_mapper.Map<PackageResponse>(customer)),
             errors => Problem(errors));
     }

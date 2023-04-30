@@ -1,0 +1,118 @@
+﻿@using AeroPackage.WebApp.Extensions
+@using AeroPackage.WebApp.Model.Package
+@using AeroPackage.WebApp.Model.Common
+@using AeroPackage.Contracts.Package;
+@using Mapster
+@inject IPackageService _packageService
+
+<MudDropContainer T="DropPackageItemDto" Items="Packages"
+                  ItemsSelector="@((item, dropzone) => item.Status == dropzone)"
+                  ItemDropped="ItemUpdated" Class="d-flex flex-wrap flex-grow-1"
+                  ApplyDropClassesOnDragStarted="true"
+                  DraggingClass="mud-alert-text-warning"
+                  ItemDraggingClass="mud-alert-text-warning">
+    <ChildContent>
+        <div class="d-flex flex-wrap justify-space-between">
+            <MudGrid>
+                @foreach (var packageStatus in PackageStatuses)
+                {
+                    var dropzone = packageStatus.Value;
+                    var canDrop = PackageStatusExtension.GetPreviousStatus(dropzone);
+
+                    <MudHidden Breakpoint="Breakpoint.LgAndUp" Invert="true">
+                        <MudItem xs="3" sm="4">
+                            <MudList Clickable="false" Dense="true" DisableGutters="true" Class="d-flex flex-column" Style="min-height: 300px">
+                                <MudDropZone T="DropPackageItemDto" Identifier="@dropzone"
+                                             CanDrop="@((item) => item.Status == canDrop)"
+                                             CanDropClass="mud-border-success"
+                                             NoDropClass="mud-border-error"
+                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1">
+                                    <MudListSubheader>
+                                        <MudText Color="Color.Primary">
+                                            <img src="@packageStatus.Icon" height="24" width="24" style="vertical-align:middle" />
+                                            &nbsp;@packageStatus.Name
+                                        </MudText>
+                                    </MudListSubheader>
+                                </MudDropZone>
+                            </MudList>
+                        </MudItem>
+                    </MudHidden>
+
+                    <MudHidden Breakpoint="Breakpoint.Md" Invert="true">
+                        <MudItem xs="6" sm="6">
+                            <MudList Clickable="false" Dense="true" DisableGutters="true" Class="d-flex flex-column" Style="min-height: 300px">
+                                <MudDropZone T="DropPackageItemDto" Identifier="@dropzone"
+                                             CanDrop="@((item) => item.Status == canDrop)"
+                                             CanDropClass="mud-border-success"
+                                             NoDropClass="mud-border-error"
+                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1">
+                                    <MudListSubheader>
+                                        <MudText Color="Color.Primary">
+                                            <img src="@packageStatus.Icon" height="24" width="24" style="vertical-align:middle" />
+                                            &nbsp;@packageStatus.Name
+                                        </MudText>
+                                    </MudListSubheader>
+                                </MudDropZone>
+                            </MudList>
+                        </MudItem>
+                    </MudHidden>
+
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
+                        <MudItem xs="12" sm="12">
+                            <MudList Clickable="false" Dense="true" DisableGutters="true" Class="d-flex flex-column" Style="min-height: 300px">
+                                <MudDropZone T="DropPackageItemDto" Identifier="@dropzone"
+                                             CanDrop="@((item) => item.Status == canDrop)"
+                                             CanDropClass="mud-border-success"
+                                             NoDropClass="mud-border-error"
+                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1">
+                                    <MudListSubheader>
+                                        <MudText Color="Color.Primary">
+                                            <img src="@packageStatus.Icon" height="24" width="24" style="vertical-align:middle" />
+                                            &nbsp;@packageStatus.Name
+                                        </MudText>
+                                    </MudListSubheader>
+                                </MudDropZone>
+                            </MudList>
+                        </MudItem>
+                    </MudHidden>
+                }
+            </MudGrid>
+        </div>
+    </ChildContent>
+    <ItemRenderer>
+        <MudListItem>
+            <MudPaper Class="ma-2">
+                <MudStack Row="true" Class="pa-4 mud-alert-text-warning">
+                    <MudImage Src="img/package.png" Width="52" Height="52"></MudImage>
+                    <MudStack Justify="Justify.Center" Spacing="0">
+                        <MudText Typo="Typo.body1"><MudLink Target="_blank" Href="@($"/paquetes/ver/{context.OwnTrackingNumber}")">@context.OwnTrackingNumber</MudLink></MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Dark" Style="vertical-align: middle; font-weight: bold">@context.Store</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Warning" Style="vertical-align: middle; font-weight: bold">@($"\u2116 de Articulos: {context.QuantityArticles}")</MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudListItem>
+    </ItemRenderer>
+</MudDropContainer>
+
+@code {
+
+    [Parameter]
+    public List<DropPackageItemDto> Packages { get; set; }
+
+
+    List<CommonPackageStatus> PackageStatuses = PackageStatusExtension.GetCommonPackageStatus();
+
+    private async Task ItemUpdated(MudItemDropInfo<DropPackageItemDto> DropPackageItemDto)
+    {
+        if (await _packageService.UpdateStatus(new UpdateStatusPackageDto()
+        {
+            OwnTrackingNumber = DropPackageItemDto.Item.OwnTrackingNumber,
+            Status = DropPackageItemDto.DropzoneIdentifier
+        }))
+        {
+            DropPackageItemDto.Item.Status = DropPackageItemDto.DropzoneIdentifier;
+        }
+    }
+}
+

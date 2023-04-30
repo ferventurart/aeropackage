@@ -22,6 +22,9 @@ public class PackageMappingConfig : IRegister
               .Map(dest => dest.CustomerId, src => src.CustomerId.Value)
               .Map(dest => dest.Status, src => src.Status.Value);
 
+        config.NewConfig<PackageHistory, PackageHistoryResponse>()
+             .Map(dest => dest.Id, src => src.Id.Value.ToString());
+
         config.NewConfig<Courier, CourierResponse>()
               .Map(dest => dest.Name, src => src.Name)
               .Map(dest => dest.UrlLogo, src => src.UrlLogo);

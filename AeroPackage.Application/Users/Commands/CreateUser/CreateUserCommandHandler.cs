@@ -36,7 +36,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Error
             BC.HashPassword(command.Password),
             (UserRole) command.Role);
 
-        user.UpdateProperty(c => c.CreatedDateTime, DateTime.UtcNow);
+        user.UpdateProperty(c => c.CreatedDateTime, DateTime.Now);
 
         _userRepository.Add(user);
 

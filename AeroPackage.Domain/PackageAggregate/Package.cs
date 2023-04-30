@@ -54,7 +54,7 @@ public sealed class Package : AggregateRoot<PackageId, int>
         int quantityArticles,
         string description,
         decimal declaredValue,
-        decimal? TaxValue,
+        decimal? taxValue,
         PackageStatus status,
         List<PackageHistory> packageHistories) : base(packageId)
     {
@@ -69,7 +69,7 @@ public sealed class Package : AggregateRoot<PackageId, int>
         QuantityArticles = quantityArticles;
         Description = description;
         DeclaredValue = declaredValue;
-        TaxValue = TaxValue;
+        TaxValue = taxValue;
         Status = status;
         _packageHistories = packageHistories;
     }
@@ -87,10 +87,11 @@ public sealed class Package : AggregateRoot<PackageId, int>
         int quantityArticles,
         string description,
         decimal declaredValue,
-        decimal? TaxValue,
         PackageStatus status,
         List<PackageHistory>? packageHistories = null)
     {
+        decimal taxValue = declaredValue > 150 ? declaredValue * 0.30m : declaredValue * 0.13m;
+
         return new Package(packageId,
             ownTrackingNumber,
             userId,
@@ -103,7 +104,7 @@ public sealed class Package : AggregateRoot<PackageId, int>
             quantityArticles,
             description,
             declaredValue,
-            TaxValue,
+            taxValue,
             status,
             packageHistories ?? new());
     }
@@ -143,10 +144,14 @@ public sealed class Package : AggregateRoot<PackageId, int>
         }
     }
 
-#pragma warning disable CS8618
+    public void AddHistoryToTimeLine(string status)
+    {
+        _packageHistories.Add(PackageHistory.Create(status));
+    }
+    #pragma warning disable CS8618
     private Package()
     {
     }
-#pragma warning restore CS8618
+    #pragma warning restore CS8618
 }
 

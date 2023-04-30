@@ -70,6 +70,9 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
 
         builder.HasIndex(d => d.CourierTrackingNumber);
 
+        builder.Property(d => d.QuantityArticles)
+               .IsRequired();
+
         builder.Property(d => d.Weight)
             .HasColumnType("decimal(10,2)");
 

@@ -21,5 +21,28 @@ public static class PackageStatusExtension
             new CommonPackageStatus() { Value = "Delivered", Name = "Entregado", Icon = "img/delivered.png" },
         };
     }
+
+    public static string GetFormattedNameOfStatus(string value) => GetCommonPackageStatus().Single(s => s.Value == value).Name;
+
+    public static string GetNextStatus(string currentStatusValue)
+    {
+        var packageStauts = GetCommonPackageStatus();
+
+        var nextStatus = packageStauts.SkipWhile(status => status.Value != currentStatusValue)
+                                         .Skip(1)
+                                         .FirstOrDefault();
+
+        return nextStatus?.Value ?? string.Empty;
+    }
+
+    public static string GetPreviousStatus(string currentStatusValue)
+    {
+        var packageStauts = GetCommonPackageStatus();
+
+        var previousStatus = packageStauts.TakeWhile(status => status.Value != currentStatusValue)
+                                      .LastOrDefault();
+
+        return previousStatus?.Value ?? currentStatusValue;
+    }
 }
 

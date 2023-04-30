@@ -46,7 +46,7 @@ public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerComman
             customerNationalIdentification,
             command.Address);
 
-        customer.UpdateProperty(c => c.CreatedDateTime, DateTime.UtcNow);
+        customer.UpdateProperty(c => c.CreatedDateTime, DateTime.Now);
 
         _customerRepository.Add(customer);
 

@@ -55,9 +55,9 @@ public class PackageService : IPackageService
             content.Add(new StringContent(package.Courier), "Courier");
             content.Add(new StringContent(package.CourierTrackingNumber), "CourierTrackingNumber");
             content.Add(new StringContent(package.Weight.ToString()), "Weight");
+            content.Add(new StringContent(package.QuantityArticles.ToString()), "QuantityArticles");
             content.Add(new StringContent(package.Description), "Description");
             content.Add(new StringContent(package.DeclaredValue.ToString()), "DeclaredValue");
-            content.Add(new StringContent(package.TaxValue.ToString()), "TaxValue");
 
             var response = await _httpClient.PostAsync("api/packages", content);
             var responseContent = await response.Content.ReadAsStringAsync();

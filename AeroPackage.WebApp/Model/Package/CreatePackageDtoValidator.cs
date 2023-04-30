@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using AeroPackage.WebApp.Model.Customer;
 using FluentValidation;
 
@@ -8,6 +9,8 @@ public class CreatePackageDtoValidator : AbstractValidator<CreatePackageDto>
 {
     public CreatePackageDtoValidator()
     {
+        ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("es-MX");
+
         RuleFor(x => x.Store)
            .NotEmpty()
            .MaximumLength(100);
@@ -27,7 +30,7 @@ public class CreatePackageDtoValidator : AbstractValidator<CreatePackageDto>
         RuleFor(x => x.QuantityArticles)
             .NotEmpty()
             .GreaterThan(0)
-            .WithName("N\00B0 de Articulos");
+            .WithName("\u2116 de Articulos");
 
         RuleFor(x => x.Description)
            .MaximumLength(100)
@@ -38,10 +41,6 @@ public class CreatePackageDtoValidator : AbstractValidator<CreatePackageDto>
             .NotEmpty()
             .GreaterThan(0.00M)
             .WithName("Valor del Paquete");
-
-        RuleFor(x => x.TaxValue)
-            .GreaterThanOrEqualTo(0)
-            .WithName("Valor por Aduana");
     }
 
     public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>

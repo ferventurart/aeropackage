@@ -19,5 +19,5 @@ public record PackageResponse(
     string CreatedBy,
     DateTime CreatedDateTime,
     List<string> Attachments,
-    List<PackageTimeLineResponse> TimeLines);
+    List<PackageHistoryResponse> PackageHistories);
 

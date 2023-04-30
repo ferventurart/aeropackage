@@ -13,7 +13,6 @@ public class CreatePackageDto
     public int QuantityArticles { get; set; }
     public string Description { get; set; }
     public decimal DeclaredValue { get; set; }
-    public decimal? TaxValue { get; set; }
     public List<IBrowserFile> Attachments { get; set; }
 }
 
