@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Http;
 using AeroPackage.WebApp.Providers.Interfaces;
 using System.Net.NetworkInformation;
+using System.Text;
+using System.Net.Http;
 
 namespace AeroPackage.WebApp.Services;
 
@@ -83,6 +85,25 @@ public class PackageService : IPackageService
 
         if (!response.IsSuccessStatusCode)
             throw new ApplicationException($"Reason: {response.ReasonPhrase}, Message: {content}");
+
+        var packageResponse = JsonSerializer.Deserialize<PackageResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        return packageResponse;
+    }
+
+    public async Task<PackageResponse> DeleteAttachment(int Id, DeleteAttachmentDto attachment)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"api/packages/{Id}/attachments");
+        var json = JsonSerializer.Serialize(attachment);
+        var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+        request.Content = requestContent;
+
+        var response = await _httpClient.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+           throw new ApplicationException($"Reason: {response.ReasonPhrase}, Message: {content}");
 
         var packageResponse = JsonSerializer.Deserialize<PackageResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 

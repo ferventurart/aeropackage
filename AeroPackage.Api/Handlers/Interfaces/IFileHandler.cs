@@ -6,5 +6,6 @@ public interface IFileHandler
     Task MoveFilesToDestinationFolder(string temporalFolder, string destinationFolder);
     Task<List<string>> UploadFilesToApi(List<IFormFile> files, string folderName);
     void DeleteFolderWithPackageAttachments(string folderName);
+    void DeleteFile(string fileName, string folderName);
 }
 

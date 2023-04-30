@@ -8,12 +8,14 @@
 @using Mapster
 @using System.Globalization;
 @using Microsoft.Extensions.Configuration
+@inject IDialogService DialogService
 @inject IConfiguration Configuration
 @inject IAuthProvider _authProvider;
 @inject NavigationManager _navigationManager
 @inject ICustomerService _customerService;
 @inject IPackageService _packageService;
-@attribute [Authorize(Roles = "Admin,Executive,Warehouse")]
+
+@attribute [Authorize(Roles = "Admin, Executive, Warehouse")]
 
 <AuthorizeView>
     <Authorized>
@@ -198,7 +200,7 @@
                                                                 <MudText Typo="Typo.body1">Imagen</MudText>
                                                             </CardHeaderContent>
                                                             <CardHeaderActions>
-                                                                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Primary" />
+                                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="(async () => await DeleteAttachmentAsync(model.Id, model.OwnTrackingNumber, file))" Color="Color.Error" />
                                                                 <MudIconButton Target="_blank" Href="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Icon="@Icons.Material.Filled.ImageSearch" Color="Color.Primary" />
                                                             </CardHeaderActions>
                                                         </MudCardHeader>
@@ -214,14 +216,14 @@
                                                         <MudCardHeader>
                                                             <CardHeaderAvatar>
                                                                 <MudAvatar Color="Color.Error">
-                                                                    <MudIcon Icon="@Icons.Material.Filled.PictureAsPdf"></MudIcon>
+                                                                    <MudIcon Icon="@Icons.Custom.FileFormats.FilePdf"></MudIcon>
                                                                 </MudAvatar>
                                                             </CardHeaderAvatar>
                                                             <CardHeaderContent>
                                                                 <MudText Typo="Typo.body1">PDF</MudText>
                                                             </CardHeaderContent>
                                                             <CardHeaderActions>
-                                                                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Primary" />
+                                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="(async () => await DeleteAttachmentAsync(model.Id, model.OwnTrackingNumber, file))" Color="Color.Error" />
                                                                 <MudIconButton Target="_blank" Href="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Icon="@Icons.Material.Filled.ZoomOutMap" Color="Color.Primary" />
                                                             </CardHeaderActions>
                                                         </MudCardHeader>
@@ -253,13 +255,12 @@
 @code {
     [Parameter]
     public string? TrackingNumber { get; set; }
-
     private bool _processing = false;
     [Inject] ISnackbar Snackbar { get; set; }
     PackageDto model = new PackageDto();
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {
+{
         new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
         new BreadcrumbItem("Paquetes", href: "/paquetes/buscar"),
         new BreadcrumbItem("Ver Paquete", href:null, disabled: true),
@@ -290,10 +291,33 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            Snackbar.Add("Ocurrio un error al recuperar la informacion del cliente.", MudBlazor.Severity.Error);
+            Snackbar.Add("Ocurrio un error al recuperar la informacion del paquete.", MudBlazor.Severity.Error);
             _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
         }
     }
 
+    private async Task DeleteAttachmentAsync(int Id, string Folder, string FileName)
+    {
+        try
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("Id", Id);
+            parameters.Add("FileName", FileName);
+            parameters.Add("FolderName", Folder);
+
+            var dialog = await DialogService.ShowAsync<DialogDeleteAttachment>("Borrar Archivo", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                model.Attachments.Remove(FileName);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error intentando eliminar el dato.", MudBlazor.Severity.Error);
+        }
+
+    }
 }
 

@@ -18,5 +18,6 @@ public interface IPackageService
     Task<PackageResponse> Update(UpdatePackageDto package);
     Task<bool> UpdateStatus(UpdateStatusPackageDto package);
     Task<PackageResponse> Delete(int Id);
+    Task<PackageResponse> DeleteAttachment(int Id, DeleteAttachmentDto attachment);
 }
 

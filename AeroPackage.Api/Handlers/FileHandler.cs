@@ -6,6 +6,18 @@ namespace AeroPackage.Api.Handlers;
 
 public class FileHandler : IFileHandler
 {
+    public void DeleteFile(string fileName, string folderName)
+    {
+        string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), $"Uploads/{folderName}");
+
+        string completeFileRoute = Path.Combine(uploadsFolder, fileName);
+
+        if (File.Exists(completeFileRoute))
+        {
+            File.Delete(completeFileRoute);
+        }
+    }
+
     public void DeleteFolderWithPackageAttachments(string folderName)
     {
         string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), $"Uploads/{folderName}");

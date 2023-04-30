@@ -21,6 +21,7 @@ using AeroPackage.Application.Packages.Commands.UpdatePackageStatus;
 using AeroPackage.Application.Customers.Commands.UpdateCustomer;
 using AeroPackage.Contracts.Customer;
 using AeroPackage.Application.Packages.Commands.UpdatePackage;
+using AeroPackage.Application.Packages.Commands.DeleteAttachment;
 
 namespace AeroPackage.Api.Controllers;
 
@@ -244,7 +245,37 @@ public class PackagesController : ApiController
         var deletePackageResult = await _mediator.Send(command);
 
         return deletePackageResult.Match(
-            customer => Ok(_mapper.Map<PackageResponse>(customer)),
+            package => Ok(_mapper.Map<PackageResponse>(package)),
+            errors => Problem(errors));
+    }
+
+    /// <summary>
+    /// Delete Package
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpDelete("{id}/attachments")]
+    public async Task<IActionResult> DeleteAttachments(int id, [FromBody] DeleteAttachmentRequest request)
+    {
+        if (id != request.Id)
+        {
+            List<Error> errors = new();
+            errors.Add(Error.Validation("PackageId", "Url Id is not equal than Request Id."));
+            return Problem(errors);
+        }
+
+        var command = _mapper.Map<DeleteAttachmentCommand>((request));
+
+        var deleteAttachmentResult = await _mediator.Send(command);
+
+        if(!deleteAttachmentResult.IsError)
+        {
+            _fileHandler.DeleteFile(request.FileName, request.OwnTrackingNumber);
+        }
+
+        return deleteAttachmentResult.Match(
+            package => Ok(_mapper.Map<PackageResponse>(package)),
             errors => Problem(errors));
     }
 }
