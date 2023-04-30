@@ -1,0 +1,386 @@
+﻿@page "/paquetes/registrar"
+@using AeroPackage.WebApp.Model.Package;
+@using AeroPackage.Contracts.Customer;
+@using AeroPackage.Contracts.Package;
+@using FluentValidation;
+@using AeroPackage.WebApp.Model.Common;
+@using AeroPackage.WebApp.Extensions;
+@using System.Globalization;
+@using AeroPackage.WebApp.Providers.Interfaces;
+@inject IAuthProvider _authProvider;
+@inject NavigationManager _navigationManager
+@inject ICustomerService _customerService;
+@inject IPackageService _packageService;
+@attribute [Authorize(Roles = "Admin,Executive")]
+@inject ILogger<Registrar> Logger
+
+<AuthorizeView>
+    <Authorized>
+        <MudContainer Fixed="true">
+            <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+            <MudCard Class="mt-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Informaci&oacute;n del Paquete</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Disabled="@_processing" Icon="@Icons.Material.Filled.ChevronLeft" Variant="Variant.Filled" Color="Color.Primary" Href="/paquetes/buscar" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudForm Model="@model" @ref="@form" Validation="@(createPackageValidator.ValidateValue)" ValidationDelay="0">
+                    <MudCardContent>
+                        <MudAutocomplete T="CustomerResponse"
+                                         Label="Clientes"
+                                         @bind-Value="_selectedCustomer"
+                                         SearchFunc="@SearchCustomerAsync"
+                                         AdornmentIcon="@Icons.Material.Filled.Search"
+                                         AdornmentColor="Color.Primary"
+                                         ShowProgressIndicator="true"
+                                         ProgressIndicatorColor="Color.Primary"
+                                         ToStringFunc="@(customer => customer == null ? null : $"{customer.FirstName} {customer.LastName}")"
+                                         Immediate="true"
+                                         Required="true"
+                                         CoerceValue="true"
+                                         RequiredError="Seleccione un cliente del listado"
+                                         Placeholder="Buscar cliente por nombre"
+                                         Class="mt-3" />
+                        <MudAutocomplete T="CommonStore"
+                                         Label="Tienda de Origen"
+                                         @bind-Value="_selectedStore"
+                                         SearchFunc="@SearchStoreAsync"
+                                         AdornmentIcon="@Icons.Material.Filled.Store"
+                                         AdornmentColor="Color.Primary"
+                                         ShowProgressIndicator="true"
+                                         ProgressIndicatorColor="Color.Primary"
+                                         Immediate="true"
+                                         Required="true"
+                                         RequiredError="Seleccione una tienda del listado"
+                                         Placeholder="Buscar tienda por nombre"
+                                         ToStringFunc="@(store => store == null ? null : $"{store.Name}")"
+                                         Class="mt-3">
+
+                            <ItemTemplate Context="e">
+                                <MudGrid>
+                                    <MudItem>
+                                        <img src="@e.UrlLogo" style="vertical-align:middle" />
+                                    </MudItem>
+                                    <MudItem>
+                                        <p style="vertical-align:middle"> @e.Name</p>
+                                    </MudItem>
+                                </MudGrid>
+                            </ItemTemplate>
+                            <ItemSelectedTemplate Context="e">
+                                <MudGrid>
+                                    <MudItem>
+                                        <img src="@e.UrlLogo" style="vertical-align:middle" />
+                                    </MudItem>
+                                    <MudItem>
+                                        <p style="vertical-align:middle"> @e.Name</p>
+                                    </MudItem>
+                                </MudGrid>
+                            </ItemSelectedTemplate>
+                        </MudAutocomplete>
+                        <MudTextField @bind-Value="model.CourierTrackingNumber"
+                                      For="@(() => model.CourierTrackingNumber)"
+                                      Immediate="true"
+                                      Label="Numero de Tracking"
+                                      Class="mt-3"
+                                      TextChanged="GetCourierByTrackingNumberAsync"
+                                      Style="vertical-align:middle"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                                      AdornmentColor="Color.Primary" />
+
+                        <MudGrid>
+                            <MudItem xs="9">
+                                <MudTextField @bind-Value="model.Courier"
+                                              For="@(() => model.Courier)"
+                                              Immediate="true"
+                                              Label="Courier"
+                                              Class="mt-3"
+                                              Style="vertical-align:middle"
+                                              Adornment="Adornment.End"
+                                              AdornmentIcon="@Icons.Material.Filled.LocalShipping"
+                                              AdornmentColor="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="3">
+                                <MudImage Height="60" Src="@courier.UrlLogo" Elevation="25" Class="rounded-lg mt-3" Style="vertical-align: middle"></MudImage>
+                            </MudItem>
+                        </MudGrid>
+
+                        <MudNumericField @bind-Value="model.Weight"
+                                         Label="Peso"
+                                         Step=".01M"
+                                         Class="mt-3"
+                                         Culture="@CultureInfo.GetCultureInfo("en-US")"
+                                         Variant="Variant.Text"
+                                         For="@(() => model.Weight)"
+                                         Format="N2"
+                                         Immediate="false"
+                                         Adornment="Adornment.End"
+                                         AdornmentIcon="@Icons.Material.Filled.MonitorWeight"
+                                         AdornmentColor="Color.Primary" />
+
+                        <MudTextField @bind-Value="model.Description"
+                                      For="@(() => model.Description)"
+                                      Immediate="true"
+                                      Label="Descripcion"
+                                      Lines="2"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.Article"
+                                      AdornmentColor="Color.Primary" />
+                        <MudGrid>
+                            <MudItem xs="6">
+                                <MudNumericField @bind-Value="model.DeclaredValue"
+                                                 Label="Valor de Paquete"
+                                                 Step=".01M"
+                                                 Class="mt-3"
+                                                 Culture="@CultureInfo.GetCultureInfo("en-US")"
+                                                 Variant="Variant.Text"
+                                                 For="@(() => model.DeclaredValue)"
+                                                 Format="N2"
+                                                 Immediate="false"
+                                                 Adornment="Adornment.Start"
+                                                 AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                                                 AdornmentColor="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudNumericField @bind-Value="model.TaxValue"
+                                                 Label="Valor por Aduana"
+                                                 Step=".01M"
+                                                 Class="mt-3"
+                                                 Culture="@CultureInfo.GetCultureInfo("en-US")"
+                                                 Variant="Variant.Text"
+                                                 For="@(() => model.TaxValue)"
+                                                 Format="N2"
+                                                 Immediate="false"
+                                                 Adornment="Adornment.Start"
+                                                 AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                                                 AdornmentColor="Color.Primary" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudInputLabel>Adjuntar Archivos</MudInputLabel>
+                                <MudFileUpload T="IReadOnlyList<IBrowserFile>"
+                                               OnFilesChanged="OnInputFileChanged"
+                                               Hidden="false"
+                                               Class="flex-1"
+                                               InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20"
+                                               InputStyle="opacity:0"
+                                               @ondragenter="@SetDragClass"
+                                               @ondragleave="@ClearDragClass"
+                                               @ondragend="@ClearDragClass"
+                                               Accept="image/*,.pdf">
+                                    <ButtonTemplate Context="ButtonTemplateContext">
+                                        @if (!isLoading)
+                                        {
+                                            <MudPaper Style="background-color: #f5f5f5ff; " Height="300px" Outlined="true" Class="@DragClass">
+                                                <br />
+                                                <br />
+                                                <br />
+                                                <br />
+                                                <MudText Typo="Typo.h6" Class="mt-5" Align="Align.Center" Color="Color.Primary">
+                                                    <MudIcon Color="Color.Primary" Icon="@Icons.Material.Filled.UploadFile" Size="Size.Large"></MudIcon>
+                                                    <br />
+                                                    Arrastre y suelte archivos aquí o haga clic aqu&iacute;
+                                                </MudText>
+                                            </MudPaper>
+                                        }
+                                        else
+                                        {
+                                            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+                                        }
+                                    </ButtonTemplate>
+                                </MudFileUpload>
+                                @if (loadedFiles != null)
+                                {
+                                    <MudText Typo="@Typo.h6" Class="mt-2 ml-2" Color="Color.Primary">@loadedFiles.Count() Archivo@(loadedFiles.Count() == 1 ? "" : "s"):</MudText>
+                                    <MudList>
+                                        @foreach (var file in loadedFiles)
+                                        {
+                                            var extension = Path.GetExtension(file.Name).ToLower();
+                                            <MudListItem Icon="@Icons.Material.Filled.AttachFile" @key="@file">
+                                                @if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" || extension == ".bmp")
+                                                {
+                                                    <MudChip Icon="@Icons.Material.Filled.Image"
+                                                             Color="Color.Primary"
+                                                             OnClose="@(() => RemoveFileFromList(file))" CloseIcon="@Icons.Material.Filled.Delete">
+                                                        @file.Name&nbsp;<code>@file.Size bytes</code>
+                                                    </MudChip>
+                                                }
+                                                else
+                                                {
+                                                    <MudChip Icon="@Icons.Material.Filled.PictureAsPdf"
+                                                             Color="Color.Error"
+                                                             OnClose="@(() => RemoveFileFromList(file))" CloseIcon="@Icons.Material.Filled.Delete">
+                                                        @file.Name&nbsp;<code>@file.Size bytes</code>
+                                                    </MudChip>
+                                                }
+                                            </MudListItem>
+                                        }
+                                    </MudList>
+                                }
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudForm>
+                <MudCardActions>
+                    <MudCardActions Class="pa-4">
+                        <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Submit())">
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Guardando...</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Guardar</MudText>
+                            }
+                        </MudButton>
+                        &nbsp;&nbsp;
+                        <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.DeleteSweep" Variant="Variant.Filled" Color="Color.Warning" OnClick="@(()=>form.Reset())">
+                            <MudText>Limpiar</MudText>
+                        </MudButton>
+                    </MudCardActions>
+                </MudCardActions>
+            </MudCard>
+        </MudContainer>
+
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+{
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Paquetes", href: "/paquetes/buscar"),
+        new BreadcrumbItem("Registrar", href: "/paquetes/registrar"),
+    };
+
+    private bool _processing = false;
+
+    MudForm form;
+    CreatePackageDtoValidator createPackageValidator = new CreatePackageDtoValidator();
+    CreatePackageDto model = new CreatePackageDto();
+    CustomerResponse _selectedCustomer;
+    CommonStore _selectedStore;
+    List<CommonStore> _commonStores = StoresExtension.GetCommonStores();
+    private CourierResponse courier = new CourierResponse(string.Empty, string.Empty);
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 15;
+    private int maxAllowedFiles = 3;
+    private bool isLoading;
+
+    private static string DefaultDragClass = "relative rounded-lg border-1 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10 align-center";
+    private string DragClass = DefaultDragClass;
+
+
+    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => await _customerService.GetCustomersActiveByName(value);
+
+    private async Task<IEnumerable<CommonStore>> SearchStoreAsync(string value) => _commonStores.Where(s => s.Name.ToLower().Contains(value.ToLower())).ToList();
+
+    private void OnCustomerSelected(CustomerResponse customer)
+    {
+        model.CustomerId = Guid.Parse(customer.Id);
+    }
+
+    private void SetDragClass()
+    {
+        DragClass = $"{DefaultDragClass} mud-border-primary";
+    }
+
+    private void ClearDragClass()
+    {
+        DragClass = DefaultDragClass;
+    }
+
+
+    private async Task OnInputFileChanged(InputFileChangeEventArgs e)
+    {
+        ClearDragClass();
+        isLoading = true;
+        loadedFiles.Clear();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                loadedFiles.Add(file);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("File: {FileName} Error: {Error}",
+                    file.Name, ex.Message);
+            }
+        }
+
+        isLoading = false;
+    }
+
+    private void RemoveFileFromList(IBrowserFile file)
+    {
+        loadedFiles.Remove(file);
+    }
+
+    private async Task<CourierResponse> GetCourierByTrackingNumberAsync(string value)
+    {
+        if (!string.IsNullOrEmpty(value))
+        {
+            courier = await _packageService.GetCourierByTrackingNumber(value);
+            model.Courier = courier.Name;
+        }
+        return courier;
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            _processing = true;
+
+            await form.Validate();
+
+            if (form.IsValid)
+            {
+                try
+                {
+                    model.UserId = await _authProvider.GetCurrentUserId();
+                    model.CustomerId = Guid.Parse(_selectedCustomer.Id);
+                    model.Store = _selectedStore.Name;
+                    model.Attachments = loadedFiles;
+
+                    var package = await _packageService.Create(model);
+                    if (package is not null)
+                    {
+                        Snackbar.Add("Paquete registrado exitosamente.", MudBlazor.Severity.Success);
+                        _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+                    }
+                    else
+                    {
+                        Snackbar.Add("Ocurrio un error al registrar el paquete, intenta nuevamente.", MudBlazor.Severity.Warning);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add("Ocurrio un error al registrar el paquete, intenta nuevamente.", MudBlazor.Severity.Error);
+                    _processing = false;
+                }
+            }
+
+            _processing = false;
+
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex);
+            Snackbar.Add("Ocurrio un error al procesar la informacion del formulario.", MudBlazor.Severity.Error);
+            _navigationManager.NavigateTo("/clientes", forceLoad: false);
+        }
+
+    }
+}

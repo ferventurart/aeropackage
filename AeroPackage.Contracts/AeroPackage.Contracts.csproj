@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Customer\" />
+    <None Remove="Package\" />
+    <None Remove="User\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Customer\" />
+    <Folder Include="Package\" />
+    <Folder Include="User\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+  </ItemGroup>
+</Project>

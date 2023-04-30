@@ -1,0 +1,178 @@
+﻿@page "/usuarios"
+@using AeroPackage.WebApp.Model
+@using AeroPackage.Contracts.User;
+@using AeroPackage.WebApp.Components.User;
+@using AeroPackage.WebApp.Providers;
+@inject IUserService _userService
+@inject IDialogService DialogService
+@attribute [Authorize(Roles = "Admin")]
+
+<AuthorizeView>
+    <Authorized>
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudCard Class="mt-4">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Listado de Usuarios</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton Href="/usuarios/crear"
+                               Class="mt-2"
+                               Color="Color.Primary" Variant="Variant.Filled"
+                               Size="Size.Small"
+                               EndIcon="@Icons.Material.Filled.Add">Nuevo</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudTable @ref="@_table"
+                      Dense="true"
+                      Hover="true"
+                      Bordered="true"
+                      Striped="true"
+                      LoadingProgressColor="Color.Primary"
+                      ServerData="@(new Func<TableState, Task<TableData<UserResponse>>>(ServerReload))"
+                      @bind-SelectedItem="_selectedUser"
+                      Breakpoint="Breakpoint.Sm"
+                      Class="mt-10">
+                <ToolBarContent>
+                    <MudTextField Style="width: fit-content" Margin="Margin.Dense" Variant="Variant.Outlined" T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Buscar" Den Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" Clearable="true" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="full_name" T="UserResponse">Nombre</MudTableSortLabel></MudTh>
+                    <MudTh>Email</MudTh>
+                    <MudTh>Rol</MudTh>
+                    <MudTh>Estado</MudTh>
+                    <MudTh>Opciones</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="user">
+                    <MudTd DataLabel="Nombre">@user.FirstName @user.LastName</MudTd>
+                    <MudTd DataLabel="Email">@user.Email</MudTd>
+                    <MudTd DataLabel="Rol">
+                        @switch (user.Role)
+                        {
+                            case 1:
+                                <MudText>Administrador</MudText>
+                                break;
+                            case 2:
+                                <MudText>Ejecutivo</MudText>
+                                break;
+                            case 3:
+                                <MudText>Bodega</MudText>
+                                break;
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Estado">
+                        @if (user.Status == 1)
+                        {
+                            <MudChip Size="Size.Small" Color="Color.Success">Activo</MudChip>
+                        }
+                        else
+                        {
+                            <MudChip Size="Size.Small">Inactivo</MudChip>
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Opciones">
+                        <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">
+                            <MudIconButton Href="@($"/usuarios/editar/{user.Id}")" Icon="@Icons.Material.Filled.Edit" Color="@Color.Surface" />
+                            <MudSpacer />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" OnClick="@(async () => await DeleteUserAsync(user.Id))" />
+                        </MudButtonGroup>
+                    </MudTd>
+                </RowTemplate>
+                <LoadingContent>
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                </LoadingContent>
+                <NoRecordsContent>
+                    <MudAlert Class="pt-2 align-center" Icon="@Icons.Material.Filled.TableView" Severity="Severity.Normal">No hay registros para mostrar.</MudAlert>
+                </NoRecordsContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudCard>
+
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+
+    [Inject] ISnackbar Snackbar { get; set; }
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+{
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Usuarios", href: "/usuarios"),
+    };
+
+    private MudTable<UserResponse> _table;
+    private string _searchCriteria = string.Empty;
+    private UserResponse _selectedUser = null;
+    private HashSet<UserResponse> _selectedItems = new HashSet<UserResponse>();
+    private PaginatedResult<UserResponse> _users = new();
+
+    private async Task DeleteUserAsync(string Id)
+    {
+        try
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("Id", Guid.Parse(Id));
+
+            var dialog = await DialogService.ShowAsync<DialogDelete>("Borrar Usuario", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                _table.ReloadServerData();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error intentando eliminar el dato.", MudBlazor.Severity.Error);
+        }
+
+    }
+
+    private async Task<TableData<UserResponse>> ServerReload(TableState state)
+    {
+        try
+        {
+            var paginatedResult = await _userService.GetAllUsers(state.PageSize, state.Page == 0 ? 1 : state.Page);
+            IEnumerable<UserResponse> data = paginatedResult.Results;
+
+            await Task.Delay(300);
+
+            data = data.Where(element =>
+            {
+                if (string.IsNullOrWhiteSpace(_searchCriteria))
+                    return true;
+                if ($"{element.FirstName.ToLower()} {element.LastName.ToLower()}".Contains(_searchCriteria.ToLower()))
+                    return true;
+                if (element.Email.Contains(_searchCriteria.ToLower()))
+                    return true;
+                return false;
+            }).ToArray();
+
+            switch (state.SortLabel)
+            {
+                case "full_name":
+                    data = data.OrderByDirection(state.SortDirection, o => $"{o.FirstName.ToLowerInvariant()} {o.LastName.ToLowerInvariant()}");
+                    break;
+            }
+
+            return new TableData<UserResponse>() { TotalItems = paginatedResult.TotalRecords, Items = data };
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error intentando recuperar la informacion.", MudBlazor.Severity.Error);
+            return new TableData<UserResponse>() { Items = null, TotalItems = 0 };
+        }
+    }
+
+    private void OnSearch(string text)
+    {
+        _searchCriteria = text;
+        _table.ReloadServerData();
+    }
+}
+

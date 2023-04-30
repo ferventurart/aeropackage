@@ -1,0 +1,25 @@
+﻿@using AeroPackage.WebApp.Extensions;
+@using AeroPackage.WebApp.Model.Common;
+
+<MudSelect T="string"
+           Label="Estados del Paquete"
+           Placeholder="Seleccione el estado del paquete"
+           TextChanged="@OnSelectChange">
+    @foreach (var status in PackageStatusExtension.GetCommonPackageStatus())
+    {
+        <MudSelectItem Value="@(status.Value)">
+            <img src="@(status.Icon)" height="20" class="mr-1" />@status.Name
+        </MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+    [Parameter]
+    public EventCallback<string> StatusSelected { get; set; }
+
+    private async Task OnSelectChange(string value)
+    {
+        await StatusSelected.InvokeAsync(value);
+    }
+}
+

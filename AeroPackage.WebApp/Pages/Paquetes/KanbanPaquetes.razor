@@ -1,0 +1,161 @@
+﻿@page "/paquetes/kanban"
+@using AeroPackage.WebApp.Model.Package;
+@using AeroPackage.WebApp.Components.Package;
+@using AeroPackage.Contracts.Package;
+@using AeroPackage.WebApp.Providers;
+@using AeroPackage.WebApp.Model.Common;
+@using AeroPackage.WebApp.Extensions;
+@using System.Globalization;
+@using Mapster
+@inject IPackageService _packageService
+@inject IDialogService DialogService
+@inject NavigationManager _navigationManager
+@attribute [Authorize(Roles = "Admin,Executive,Warehouse")]
+
+<AuthorizeView>
+    <Authorized>
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudExpansionPanels>
+            <MudExpansionPanel>
+                <TitleContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.FilterAlt" class="mr-3"></MudIcon>
+                        <MudText>Filtra tus <strong>Paquetes</strong></MudText>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <MudGrid>
+                        <MudItem xs="12" md="6">
+                            <MudDateRangePicker @ref="_picker"
+                                                @bind-DateRange="_dateRange"
+                                                Label="Filtrar por Fechas"
+                                                HelperText="Seleccione un periodo de tiempo"
+                                                DateFormat="dd/MM/yyyy"
+                                                TitleDateFormat="dddd, dd. MMMM"
+                                                Culture="@CultureInfo.GetCultureInfo("es-ES")">
+                            </MudDateRangePicker>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MultiSelectCommonStores StoresSelected="StoresSelectedCallback" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudButton OnClick="OnFilterPackages"
+                                       Variant="Variant.Filled"
+                                       EndIcon="@Icons.Material.Filled.Search"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       style="float: right;"
+                                       Disabled="@disabledFilterButton">Filtrar</MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+
+        <MudDropContainer T="DropPackageItemDto" Items="_dropItems"
+                          ItemsSelector="@((item,dropzone) => item.Status == dropzone)" ItemDropped="ItemUpdated"
+                          Class="d-flex flex-wrap">
+            <ChildContent>
+                @foreach (var status in PackageStatusExtension.GetCommonPackageStatus())
+                {
+                    <MudPaper Class="ma-4" Width="280px">
+                        <MudList Clickable="false" Class="mud-height-full">
+                            <MudDropZone T="DropPackageItemDto" Identifier="@(status.Value)" Class="mud-height-full">
+                                <MudListSubheader>
+                                    <img src="@status.Icon" height="24" width="24" style="vertical-align:middle" />
+                                    &nbsp;@status.Name
+                                </MudListSubheader>
+                            </MudDropZone>
+                        </MudList>
+                    </MudPaper>
+                }
+            </ChildContent>
+            <ItemRenderer Context="ItemDropRendered">
+                <MudListItem>
+                    <div class="mud-elevation-2 pa-2 rounded-lg mud-alert-text-warning">
+                        <MudIcon Icon="fa-solid fa-box"></MudIcon>&nbsp;
+                        <MudLink Target="_blank" Href="@($"/paquetes/ver/{ItemDropRendered.OwnTrackingNumber}")">@ItemDropRendered.OwnTrackingNumber</MudLink><br />
+                        &nbsp;<MudText Color="Color.Dark" Inline="true">@(ItemDropRendered.Description.Length > 15 ? ItemDropRendered.Description.Substring(0, 15) : ItemDropRendered.Description)</MudText><br />
+                        &nbsp;<MudText Style="font-weight: bold" Color="Color.Dark" Inline="true">@ItemDropRendered.Store</MudText>
+                    </div>
+                </MudListItem>
+            </ItemRenderer>
+        </MudDropContainer>
+
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+
+    [Inject] ISnackbar Snackbar { get; set; }
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {   
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Paquetes", href: "/paquetes/buscar"),
+        new BreadcrumbItem("Buscar", href: "/paquetes/buscar"),
+    };
+
+    private MudDateRangePicker _picker;
+    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+    public string _packageStore { get; set; } = "Amazon";
+    private List<DropPackageItemDto> _dropItems = new();
+    private bool disabledFilterButton = false;
+
+    private async Task GetPackages()
+    {
+        List<DragPackageResponse> packages = await _packageService.GetPackagesByPeriodAndStore(_dateRange.Start.Value, _dateRange.End.Value, _packageStore);
+        if (packages is not null && packages.Count > 0)
+        {
+            _dropItems = packages.Adapt<List<DropPackageItemDto>>();
+        }
+        else
+        {
+            Snackbar.Add("No se encontraron paquetes segun su criterio de busqueda.", MudBlazor.Severity.Warning);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await GetPackages();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            Snackbar.Add("Ocurrio un error al recuperar la informacion del cliente.", MudBlazor.Severity.Error);
+            _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+        }
+    }
+
+    private async Task OnFilterPackages() => await GetPackages();
+
+    private void StoresSelectedCallback(List<string> stores)
+    {
+        if (stores.Count > 5)
+        {
+            disabledFilterButton = true;
+        }
+        else
+        {
+            disabledFilterButton = false;
+            _packageStore = string.Join(",", stores);
+        }
+    }
+
+    private async Task ItemUpdated(MudItemDropInfo<DropPackageItemDto> dropItem)
+    {
+        if (await _packageService.UpdateStatus(new UpdateStatusPackageDto()
+        {
+            OwnTrackingNumber = dropItem.Item.OwnTrackingNumber,
+            Status = dropItem.DropzoneIdentifier
+        }))
+        {
+            dropItem.Item.Status = dropItem.DropzoneIdentifier;
+        }
+    }
+
+}
+

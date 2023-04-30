@@ -1,0 +1,61 @@
+﻿@using AeroPackage.WebApp.Components.Authorization
+@inherits LayoutComponentBase
+@inject NavigationManager _navigationManager
+@inject ILocalStorageService _localStorage
+
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<AuthorizeView>
+    <Authorized>
+        <MudLayout>
+            <MudAppBar Elevation="0">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+                <MudSpacer />
+                <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" Link="https://mudblazor.com/" Target="_blank" />
+                <MudMenu FullWidth="true" Size="Size.Medium" AnchorOrigin="Origin.BottomRight" Dense="true">
+                    <ActivatorContent>
+                        <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">@context.User.Identity.Name</MudChip>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem Icon="fa-solid fa-id-badge">Perfil</MudMenuItem>
+                        <MudMenuItem Icon="fa-solid fa-right-from-bracket" OnClick="@(async () => await LogoutAsync())">Salir</MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
+            </MudAppBar>
+            <MudDrawer @bind-Open="_drawerOpen" Elevation="1" PreserveOpenState="false" Breakpoint="Breakpoint.Sm">
+                <MudDrawerHeader>
+                    <MudImage Fluid="true" Width="100" Height="100" Class="mt-2 ml-10" Src="img/logo_aero_drawer.png" />
+                </MudDrawerHeader>
+                <NavMenu />
+            </MudDrawer>
+            <MudMainContent>
+                <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-2">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </MudLayout>
+    </Authorized>
+    <NotAuthorized>
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    @inject IDialogService DialogService
+
+    bool _drawerOpen;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    protected async Task LogoutAsync()
+    {
+        DialogService.Show<DialogLogout>("Cerrar Sesi\u00f3n");
+    }
+}

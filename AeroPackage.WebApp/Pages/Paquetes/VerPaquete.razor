@@ -1,0 +1,381 @@
+﻿@page "/paquetes/ver/{TrackingNumber}"
+@using AeroPackage.Contracts.Package;
+@using AeroPackage.WebApp.Model.Package;
+@using AeroPackage.WebApp.Model.Common;
+@using AeroPackage.WebApp.Extensions;
+@using AeroPackage.WebApp.Providers.Interfaces;
+@using Mapster
+@using System.Globalization;
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@inject IAuthProvider _authProvider;
+@inject NavigationManager _navigationManager
+@inject ICustomerService _customerService;
+@inject IPackageService _packageService;
+@attribute [Authorize(Roles = "Admin,Executive,Warehouse")]
+
+<AuthorizeView>
+    <Authorized>
+        <MudContainer Fixed="true">
+            <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+            <MudButton Href="/paquetes/buscar"
+                       Variant="Variant.Text"
+                       StartIcon="@Icons.Material.Filled.ChevronLeft"
+                       Color="Color.Primary"
+                       Size="Size.Small"
+                       Style="text-transform:none">Volver a Paquetes</MudButton>
+            <br /><br />
+            <MudText Typo="Typo.h6" Class="ml-2" Color="Color.Primary">Detalle del paquete: @TrackingNumber</MudText>
+            <MudGrid Justify="Justify.FlexStart" Class="mt-5">
+                <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
+                    <MudItem xs="12" sm="12">
+                        <MudText Typo="Typo.subtitle1" Class="ml-2" Color="Color.Info">Informacion General</MudText>
+                        <br />
+                        <MudPaper Elevation="5">
+                            <MudCard>
+                                <MudCardContent Class="d-flex align-center justify-center mud-width-full py-8">
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Consignatario</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Consignee</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Tienda</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Store</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Numero de Courier</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.CourierTrackingNumber</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Courier</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Courier</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Descripcion</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Description</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Valor Declarado</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.DeclaredValue.ToString("C", CultureInfo.CurrentCulture)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Valor por Aduana</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@(model.TaxValue is not null ? model.TaxValue?.ToString("C", CultureInfo.CurrentCulture) : 0.0m.ToString("C", CultureInfo.CurrentCulture))</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Peso</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Weight.ToString("N2") lbs</MudText>
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudCardContent>
+                            </MudCard>
+                        </MudPaper>
+                    </MudItem>
+                </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.LgAndUp" Invert="true">
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.subtitle1" Class="ml-2" Color="Color.Info">Informacion General</MudText>
+                        <br />
+                        <MudPaper Elevation="5">
+                            <MudCard>
+                                <MudCardContent Class="d-flex align-center justify-center mud-width-full py-8">
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Consignatario</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Consignee</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Tienda</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Store</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Numero de Courier</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.CourierTrackingNumber</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Courier</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Courier</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Descripcion</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Description</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Valor Declarado</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.DeclaredValue.ToString("C", CultureInfo.CurrentCulture)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Valor por Aduana</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@(model.TaxValue is not null ? model.TaxValue?.ToString("C", CultureInfo.CurrentCulture) : 0.0m.ToString("C", CultureInfo.CurrentCulture))</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.subtitle1">Peso</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="8">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: bold">@model.Weight.ToString("N2") lbs</MudText>
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudCardContent>
+                            </MudCard>
+                        </MudPaper>
+                    </MudItem>
+                </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.LgAndUp" Invert="true">
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.subtitle1" Class="ml-2" Color="Color.Info">Historial</MudText>
+                        <br />
+                        <MudTimeline TimelinePosition="TimelinePosition.Start">
+                            <MudTimelineItem>
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Registrado</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:10</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem Color="Color.Info" TimelineAlign="TimelineAlign.End">
+                                <MudCard Elevation="25" Class="d-flex mud-width-full">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.subtitle1" Style="font-weight: bold">Recibido en USA</MudText>
+                                        <MudText Typo="Typo.body2">Yesterday: 16:33</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Preparando para Env&iacute;o</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">En Transito a Pa&iacute;s Destino</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Recibido en Pa&iacute;s Destino</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Procesandose en Aduana</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Liberado en Aduanas</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Almacenado en Bodega ESA</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold"> Entregado a Transportista Local</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Entregado</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Today: 17:00</MudText>
+                            </MudTimelineItem>
+                        </MudTimeline>
+                    </MudItem>
+                </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.subtitle1" Class="ml-2" Color="Color.Info">Historial</MudText>
+                        <br />
+                        <MudTimeline TimelinePosition="TimelinePosition.Start">
+                            <MudTimelineItem>
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Registrado</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:10</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem Color="Color.Info" TimelineAlign="TimelineAlign.End">
+                                <MudCard Elevation="25" Class="d-flex mud-width-full">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.subtitle1" Style="font-weight: bold">Recibido en USA</MudText>
+                                        <MudText Typo="Typo.body2">Yesterday: 16:33</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Preparando para Env&iacute;o</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">En Transito a Pa&iacute;s Destino</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Recibido en Pa&iacute;s Destino</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Procesandose en Aduana</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Liberado en Aduanas</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Almacenado en Bodega ESA</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold"> Entregado a Transportista Local</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Yesterday: 17:15</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.body2" Style="font-weight: bold">Entregado</MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">Today: 17:00</MudText>
+                            </MudTimelineItem>
+                        </MudTimeline>
+                    </MudItem>
+                </MudHidden>
+                <MudItem xs="12" sm="12">
+                    <MudText Typo="Typo.subtitle1" Class="ml-2" Color="Color.Info">Archivos Adjuntos</MudText>
+                    <br />
+                    <MudPaper Elevation="3">
+                        <MudCard>
+                            <MudCardContent>
+                                @if (model.Attachments != null && model.Attachments.Count > 0)
+                                {
+                                    <MudList>
+                                        @foreach (var file in model.Attachments)
+                                        {
+                                            var extension = Path.GetExtension(file).ToLower();
+                                            <MudListItem @key="@file">
+                                                @if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" || extension == ".bmp")
+                                                {
+                                                    <MudCard>
+                                                        <MudCardHeader>
+                                                            <CardHeaderAvatar>
+                                                                <MudAvatar Color="Color.Secondary">
+                                                                    <MudIcon Icon="@Icons.Material.Filled.Image"></MudIcon>
+                                                                </MudAvatar>
+                                                            </CardHeaderAvatar>
+                                                            <CardHeaderContent>
+                                                                <MudText Typo="Typo.body1">Imagen</MudText>
+                                                            </CardHeaderContent>
+                                                            <CardHeaderActions>
+                                                                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Primary" />
+                                                                <MudIconButton Target="_blank" Href="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Icon="@Icons.Material.Filled.ImageSearch" Color="Color.Primary" />
+                                                            </CardHeaderActions>
+                                                        </MudCardHeader>
+                                                        <MudCardMedia Image="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Height="300" />
+                                                        <MudCardContent>
+                                                            <MudText Typo="Typo.body2">@file</MudText>
+                                                        </MudCardContent>
+                                                    </MudCard>
+                                                }
+                                                else
+                                                {
+                                                    <MudCard>
+                                                        <MudCardHeader>
+                                                            <CardHeaderAvatar>
+                                                                <MudAvatar Color="Color.Error">
+                                                                    <MudIcon Icon="@Icons.Material.Filled.PictureAsPdf"></MudIcon>
+                                                                </MudAvatar>
+                                                            </CardHeaderAvatar>
+                                                            <CardHeaderContent>
+                                                                <MudText Typo="Typo.body1">PDF</MudText>
+                                                            </CardHeaderContent>
+                                                            <CardHeaderActions>
+                                                                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Primary" />
+                                                                <MudIconButton Target="_blank" Href="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Icon="@Icons.Material.Filled.ZoomOutMap" Color="Color.Primary" />
+                                                            </CardHeaderActions>
+                                                        </MudCardHeader>
+                                                        <MudCardContent>
+                                                            <MudText Typo="Typo.body2">@file</MudText>
+                                                        </MudCardContent>
+                                                    </MudCard>
+                                                }
+                                            </MudListItem>
+                                        }
+                                    </MudList>
+                                }
+                                else
+                                {
+                                    <MudAlert Severity="Severity.Info">El paquete no tiene archivos adjuntos.</MudAlert>
+                                }
+                            </MudCardContent>
+                        </MudCard>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string? TrackingNumber { get; set; }
+
+    private bool _processing = false;
+    [Inject] ISnackbar Snackbar { get; set; }
+    PackageDto model = new PackageDto();
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+{
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Paquetes", href: "/paquetes/buscar"),
+        new BreadcrumbItem("Ver Paquete", href:null, disabled: true),
+    };
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (TrackingNumber is not null)
+            {
+                var packageResponse = await _packageService.GetByTrackingNumber(TrackingNumber);
+                if (packageResponse is not null)
+                {
+                    model = packageResponse.Adapt<PackageDto>();
+                }
+                else
+                {
+                    Snackbar.Add("El cliente solicitado no existe.", MudBlazor.Severity.Warning);
+                    _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+                }
+            }
+            else
+            {
+                _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            Snackbar.Add("Ocurrio un error al recuperar la informacion del cliente.", MudBlazor.Severity.Error);
+            _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+        }
+    }
+
+}
+

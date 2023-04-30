@@ -1,0 +1,11 @@
+﻿@page "/dashboard"
+@attribute [Authorize (Roles = "Admin")]
+
+<AuthorizeView>
+    <Authorized>
+     
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>

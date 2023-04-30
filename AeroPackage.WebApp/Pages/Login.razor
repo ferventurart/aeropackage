@@ -1,0 +1,124 @@
+﻿@using AeroPackage.WebApp.Layouts
+@using AeroPackage.WebApp.Model
+@using AeroPackage.WebApp.Model.Authentication
+@using AeroPackage.Contracts.Authentication
+@using AeroPackage.WebApp.Services.Interfaces
+@using FluentValidation
+@inject NavigationManager _navigationManager
+@inject IAuthenticationService _authService
+@inject ILocalStorageService _localStorage
+@inject AuthenticationStateProvider AuthStateProvider
+@page "/"
+@layout LoginLayout
+
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="container">
+            <MudCard Class="mud-card-media-centered" Width="350px">
+                <MudImage Src="img/logo_aero_login.png" Class="px-auto ml-16" Height="210" />
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Align="Align.Center">Iniciar Sesi&oacute;n</MudText>
+                    <MudForm Class="pa-4" Model="@model" @ref="@form" Validation="@(loginValidator.ValidateValue)" ValidationDelay="0">
+                        <MudTextField @bind-Value="model.Email"
+                                      For="@(() => model.Email)"
+                                      Immediate="true"
+                                      Label="Email" />
+
+                        <MudTextField @bind-Value="model.Password"
+                                      Label="Password"
+                                      Variant="Variant.Text"
+                                      InputType="@PasswordInput"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      OnAdornmentClick="ShowHidePassword"
+                                      AdornmentAriaLabel="Ver Password"
+                                      Immediate="true" />
+
+                    </MudForm>
+                </MudCardContent>
+                <MudCardActions Class="pa-4">
+                    <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Lock" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="@(async () => await Submit())">
+                        @if (_processing)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Ingresando...</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Ingresar</MudText>
+                        }
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </div>
+    </NotAuthorized>
+    <Authorized>
+        <MudButton StartIcon="@Icons.Material.Filled.Home"
+                   Variant="Variant.Filled" Color="Color.Primary"
+                   FullWidth="true" OnClick="@(async () => await BackHome())">
+            <MudText>Regresar al Tablero de Control</MudText>
+        </MudButton>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    [Inject] ISnackbar Snackbar { get; set; }
+    private bool _processing = false;
+    MudForm form;
+    LoginDtoValidator loginValidator = new LoginDtoValidator();
+    LoginDto model = new LoginDto();
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void ShowHidePassword()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    protected async Task BackHome()
+    {
+        _navigationManager.NavigateTo("/dashboard", forceLoad: true);
+    }
+
+    private async Task Submit()
+    {
+        _processing = true;
+
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            try
+            {
+                var response = await _authService.Login(model);
+                if (!string.IsNullOrEmpty(response.Token))
+                {
+                    _navigationManager.NavigateTo("/dashboard", forceLoad: true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Ocurrio un error al iniciar sesi&oacuten, intenta nuevamente.", MudBlazor.Severity.Error);
+                _processing = false;
+            }
+        }
+        else
+        {
+            _processing = false;
+        }
+    }
+}
+

@@ -1,0 +1,29 @@
+﻿@inject NavigationManager _navigationManager
+@inject ILocalStorageService _localStorage
+
+<MudDialog>
+    <DialogContent>
+        <MudText>Esta seguro que quiere salir de la aplicaci&oacute;n</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Warning"
+                   Variant="Variant.Filled"
+                   OnClick="@(async () => await LogoutAsync())">
+        <i class="fa-solid fa-right-from-bracket"></i>&nbsp;Si, Salir</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    protected async Task LogoutAsync()
+    {
+        await _localStorage.RemoveItemAsync("jwt");
+        _navigationManager.NavigateTo("/", forceLoad: true);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    void Cancel() => MudDialog.Cancel();
+}
+

@@ -1,0 +1,41 @@
+﻿@inject ICustomerService _customerService;
+@inject NavigationManager _navigationManager
+
+<MudDialog>
+    <DialogContent>
+        <MudText>¿Esta seguro que quiere eliminarlo?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Error"
+                   Variant="Variant.Filled"
+                   OnClick="@(async () => await DeleteClienteAsync())">
+            <i class="fa-solid fa-trash"></i>&nbsp;Si, Borrarlo
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public Guid Id { get; set; }
+
+    protected async Task DeleteClienteAsync()
+    {
+        await _customerService.Delete(Id);
+
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add("Cliente eliminado exitosamente.", MudBlazor.Severity.Warning, config =>
+        {
+            config.Icon = Icons.Material.Filled.Delete;
+        });
+
+        MudDialog.Close(DialogResult.Ok(Id));
+    }
+    void Cancel() => MudDialog.Cancel();
+}
+

@@ -1,0 +1,181 @@
+﻿@page "/clientes/editar/{id}"
+@using AeroPackage.Contracts.Customer;
+@using AeroPackage.WebApp.Components.Customer;
+@using AeroPackage.WebApp.Model.Customer;
+@using FluentValidation
+@using Mapster
+@inject NavigationManager _navigationManager
+@inject ICustomerService _customerService;
+@attribute [Authorize(Roles = "Admin,Executive")]
+
+<AuthorizeView>
+    <Authorized>
+        <MudContainer Fixed="true">
+            <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+            <MudCard Class="mt-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Informaci&oacute;n del Cliente</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Disabled="@_processing" Icon="@Icons.Material.Filled.ChevronLeft" Variant="Variant.Filled" Color="Color.Primary" Href="/clientes" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudForm Model="@model" @ref="@form" Validation="@(updateCustomerValidator.ValidateValue)" ValidationDelay="0">
+                    <MudCardContent>
+                        <MudTextField @bind-Value="model.FirstName"
+                                      For="@(() => model.FirstName)"
+                                      Immediate="true"
+                                      Label="Nombre" />
+
+                        <MudTextField @bind-Value="model.LastName"
+                                      For="@(() => model.LastName)"
+                                      Immediate="true"
+                                      Label="Apellido" />
+
+
+                        <MudTextField @bind-Value="model.Email"
+                                      For="@(() => model.Email)"
+                                      Immediate="true"
+                                      Label="Email" />
+
+
+                        <MudTextField @bind-Value="model.Identification"
+                                      For="@(() => model.Identification)"
+                                      Immediate="true"
+                                      Placeholder="00000000-0"
+                                      Mask="@(new PatternMask("00000000-0"))"
+                                      Label="Dui" />
+
+                        <MudTextField @bind-Value="model.CellPhoneNumber"
+                                      For="@(() => model.CellPhoneNumber)"
+                                      Immediate="true"
+                                      Placeholder="0000-0000"
+                                      Mask="@(new PatternMask("0000-0000"))"
+                                      Label="Celular" />
+
+                        <MudTextField @bind-Value="model.Address"
+                                      For="@(() => model.Address)"
+                                      Immediate="true"
+                                      Label="Direccion" />
+
+                        <MudRadioGroup Class="my-4" @bind-SelectedOption="model.Gender" For="@(() => model.Gender)" Required="true">
+                            <MudRadio Color="Color.Info" Option="@(1)">Hombre</MudRadio>
+                            <MudRadio Color="Color.Secondary" Option="@(2)">Mujer</MudRadio>
+                        </MudRadioGroup>
+
+                        <MudSwitch @bind-Checked="@model.Status" Label="@(model.Status == 1 ? "Activo" : "Inactivo")" Color="Color.Success" />
+
+                    </MudCardContent>
+                </MudForm>
+                <MudCardActions>
+                    <MudCardActions Class="pa-4">
+                        <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Submit())">
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Guardando...</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Guardar</MudText>
+                            }
+                        </MudButton>
+                    </MudCardActions>
+                </MudCardActions>
+            </MudCard>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Clientes", href: "/clientes"),
+        new BreadcrumbItem("Editar Cliente", href: "/clientes/editar"),
+    };
+
+    private bool _processing = false;
+    private Guid _customerId;
+    [Inject] ISnackbar Snackbar { get; set; }
+    MudForm form;
+    UpdateCustomerDtoValidator updateCustomerValidator = new UpdateCustomerDtoValidator();
+    UpdateCustomerDto model = new UpdateCustomerDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (Id is not null)
+            {
+                _customerId = Guid.Parse(Id);
+                var customerResponse = await _customerService.GetById(_customerId);
+                if (customerResponse is not null)
+                {
+                    model = customerResponse.Adapt<UpdateCustomerDto>();
+                }
+                else
+                {
+                    Snackbar.Add("El cliente solicitado no existe.", MudBlazor.Severity.Warning);
+                    _navigationManager.NavigateTo("/clientes", forceLoad: false);
+                }
+            }
+            else
+            {
+                _navigationManager.NavigateTo("/clientes", forceLoad: false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error al recuperar la informacion del cliente.", MudBlazor.Severity.Error);
+            _navigationManager.NavigateTo("/clientes", forceLoad: false);
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            _processing = true;
+
+            await form.Validate();
+
+            if (form.IsValid)
+            {
+                try
+                {
+                    model.Id = _customerId;
+                    var customer = await _customerService.Update(model);
+                    if (customer is not null)
+                    {
+                        Snackbar.Add("Cliente actualizado exitosamente.", MudBlazor.Severity.Success);
+                        _navigationManager.NavigateTo("/clientes", forceLoad: false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add("Ocurrio un error al actualizar el cliente, intenta nuevamente.", MudBlazor.Severity.Error);
+                    _processing = false;
+                }
+            }
+            else
+            {
+                _processing = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error al procesar la informacion del formulario.", MudBlazor.Severity.Error);
+            _navigationManager.NavigateTo("/clientes", forceLoad: false);
+        }
+
+    }
+}
+

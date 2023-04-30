@@ -1,0 +1,23 @@
+﻿@using AeroPackage.WebApp.Components.Error;
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(AeroPackage.WebApp.Layouts.MainLayout)">
+                <Authorizing>
+                    <text>We are authorizing the user......</text>
+                </Authorizing>
+                <NotAuthorized>
+                    <Unauthorized />
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(AeroPackage.WebApp.Layouts.MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

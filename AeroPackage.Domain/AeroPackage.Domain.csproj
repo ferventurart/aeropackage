@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.SmartEnum" Version="7.0.0" />
+    <PackageReference Include="ErrorOr" Version="1.2.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="CustomerAggregate\" />
+    <None Remove="CustomerAggregate\ValueObjects\" />
+    <None Remove="CustomerAggregate\Enums\" />
+    <None Remove="Common\Enums\" />
+    <None Remove="PackageAggregate\" />
+    <None Remove="PackageAggregate\ValueObjects\" />
+    <None Remove="PackageAggregate\Enums\" />
+    <None Remove="UserAggregate\Enums\" />
+    <None Remove="PackageAggregate\Constants\" />
+    <None Remove="PackageAggregate\Entities\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CustomerAggregate\" />
+    <Folder Include="CustomerAggregate\ValueObjects\" />
+    <Folder Include="CustomerAggregate\Enums\" />
+    <Folder Include="Common\Enums\" />
+    <Folder Include="PackageAggregate\" />
+    <Folder Include="PackageAggregate\ValueObjects\" />
+    <Folder Include="PackageAggregate\Enums\" />
+    <Folder Include="UserAggregate\Enums\" />
+    <Folder Include="PackageAggregate\Constants\" />
+    <Folder Include="PackageAggregate\Entities\" />
+  </ItemGroup>
+</Project>

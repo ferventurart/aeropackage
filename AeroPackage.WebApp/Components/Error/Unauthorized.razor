@@ -1,0 +1,27 @@
+﻿@using AeroPackage.WebApp.Layouts
+@inject NavigationManager _navigationManager
+@layout ErrorLayout
+
+<AuthorizeView>
+    <Authorized>
+        <MudAlert Icon="fa-solid fa-ban" Severity="Severity.Warning" ContentAlignment="HorizontalAlignment.Center">Estimado usuario, no tienes permisos a este modulo de la aplicaci&oacute;n.</MudAlert>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Icon="fa-solid fa-user-shield" Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center">Estimado usuario te invitamos a autenticarte para acceder a la aplicaci&oacute;n.</MudAlert>
+        <MudDivider Class="my-2 mt-3" />
+        <MudButton StartIcon="@Icons.Material.Filled.Lock"
+                   Variant="Variant.Filled" Color="Color.Primary"
+                   FullWidth="true" OnClick="@(async () => await ReturnToLoginAsync())">
+            <MudText>Regresar al Login</MudText>
+        </MudButton>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    bool visible = true;
+
+    protected async Task ReturnToLoginAsync()
+    {
+        _navigationManager.NavigateTo("/", forceLoad: true);
+    }
+}

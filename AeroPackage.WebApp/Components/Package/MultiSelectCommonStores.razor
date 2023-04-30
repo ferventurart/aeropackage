@@ -1,0 +1,44 @@
+﻿@using AeroPackage.WebApp.Extensions;
+@using AeroPackage.WebApp.Model.Common;
+
+<MudSelect T="string"
+           MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))"
+           @bind-Value="_packageStore"
+           @bind-SelectedValues="options"
+           Label="Tienda"
+           Placeholder="Seleccione la tienda de origen"
+           MultiSelection="true"
+           HelperText="Seleccione maximo 5 tiendas"
+           TextChanged="@(() => StoresSelected.InvokeAsync(_selectedValues))">
+    @foreach (var store in _commonStores)
+    {
+        <MudSelectItem Value="@store.Name">
+            <img src="@store.UrlLogo" style="vertical-align:middle" /> @store.Name
+        </MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+    [Parameter]
+    public EventCallback<List<string>> StoresSelected { get; set; }
+
+    List<CommonStore> _commonStores = StoresExtension.GetCommonStores();
+    private string _packageStore { get; set; } = "Amazon";
+    private IEnumerable<string> options { get; set; } = new HashSet<string>() { "Amazon" };
+    private List<string> _selectedValues = new();
+
+
+    private string GetMultiSelectionText(List<string> selectedValues)
+    {
+        if (selectedValues.Count == 0)
+        {
+            _selectedValues.Clear();
+            return "No ha seleccionado ninguna tienda";
+        }
+
+        _selectedValues = selectedValues;
+
+        return $"{selectedValues.Count} tienda{(selectedValues.Count > 1 ? "s" : "")} seleccionad{(selectedValues.Count > 1 ? "as" : "a")}";
+    }
+}
+

@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.5.2" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="MediatR" Version="11.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AeroPackage.Domain\AeroPackage.Domain.csproj" />
+    <ProjectReference Include="..\AeroPackage.Contracts\AeroPackage.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Customers\" />
+    <None Remove="Customers\Commands\" />
+    <None Remove="Customers\Commands\CreateCustomer\" />
+    <None Remove="Customers\Commands\UpdateCustomer\" />
+    <None Remove="Customers\Commands\DeleteCustomer\" />
+    <None Remove="Customers\Queries\" />
+    <None Remove="Customers\Queries\GetCustomerById\" />
+    <None Remove="Customers\Queries\GetCustomers\" />
+    <None Remove="Packages\" />
+    <None Remove="Packages\Commands\" />
+    <None Remove="Packages\Commands\CreatePackage\" />
+    <None Remove="Packages\Commands\UpdatePackage\" />
+    <None Remove="Packages\Queries\" />
+    <None Remove="Packages\Queries\GetPackagesByCustomer\" />
+    <None Remove="Authentication\Queries\Verify\" />
+    <None Remove="Authentication\Queries\Login\" />
+    <None Remove="Common\Models\" />
+    <None Remove="Users\" />
+    <None Remove="Users\Commands\" />
+    <None Remove="Users\Queries\" />
+    <None Remove="Users\Commands\UpdateUser\" />
+    <None Remove="Users\Queries\GetUserById\" />
+    <None Remove="Users\Queries\GetUsers\" />
+    <None Remove="Users\Commands\DeleteUser\" />
+    <None Remove="Users\Commands\CreateUser\" />
+    <None Remove="Packages\Queries\GetCourierByTrackingNumber\" />
+    <None Remove="Common\Behaviors\" />
+    <None Remove="Packages\Commands\AssignPackage\" />
+    <None Remove="Packages\Events\" />
+    <None Remove="Packages\Commands\UpdatePackageStatus\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Customers\" />
+    <Folder Include="Customers\Commands\" />
+    <Folder Include="Customers\Commands\CreateCustomer\" />
+    <Folder Include="Customers\Commands\UpdateCustomer\" />
+    <Folder Include="Customers\Commands\DeleteCustomer\" />
+    <Folder Include="Customers\Queries\" />
+    <Folder Include="Customers\Queries\GetCustomerById\" />
+    <Folder Include="Customers\Queries\GetCustomers\" />
+    <Folder Include="Packages\" />
+    <Folder Include="Packages\Commands\" />
+    <Folder Include="Packages\Commands\CreatePackage\" />
+    <Folder Include="Packages\Commands\UpdatePackage\" />
+    <Folder Include="Packages\Queries\" />
+    <Folder Include="Packages\Queries\GetPackagesByCustomer\" />
+    <Folder Include="Authentication\Queries\Verify\" />
+    <Folder Include="Authentication\Queries\Login\" />
+    <Folder Include="Common\Models\" />
+    <Folder Include="Users\" />
+    <Folder Include="Users\Commands\" />
+    <Folder Include="Users\Queries\" />
+    <Folder Include="Users\Commands\UpdateUser\" />
+    <Folder Include="Users\Queries\GetUserById\" />
+    <Folder Include="Users\Queries\GetUsers\" />
+    <Folder Include="Users\Commands\DeleteUser\" />
+    <Folder Include="Users\Commands\CreateUser\" />
+    <Folder Include="Packages\Queries\GetCourierByTrackingNumber\" />
+    <Folder Include="Common\Behaviors\" />
+    <Folder Include="Packages\Commands\AssignPackage\" />
+    <Folder Include="Packages\Events\" />
+    <Folder Include="Packages\Commands\UpdatePackageStatus\" />
+  </ItemGroup>
+</Project>

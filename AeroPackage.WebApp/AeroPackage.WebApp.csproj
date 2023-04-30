@@ -1,0 +1,97 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Version>1.2</Version>
+		<Authors>Megabit</Authors>
+		<Company>Megabit</Company>
+		<Description>Aplicacion Web de AeroPackage</Description>
+		<Copyright>Copyright 2018-2023 Megabit</Copyright>
+		<UserSecretsId>5f5aaa4a-a59f-4902-bb99-a1643394d9e0</UserSecretsId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'AeroPackage.WebApp.Client' ">
+	  <ExternalConsole>true</ExternalConsole>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	  <WarningLevel>4</WarningLevel>
+	  <PlatformTarget>anycpu</PlatformTarget>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.*" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.*" PrivateAssets="all" />
+		<PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.5" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.2" />
+		<PackageReference Include="MudBlazor" Version="6.2.2" />
+		<PackageReference Include="Mapster" Version="7.3.0" />
+		<PackageReference Include="Mapster.DependencyInjection" Version="1.0.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="wwwroot\img\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="wwwroot\img\" />
+	  <Folder Include="Pages\Paquetes\" />
+	  <Folder Include="Model\" />
+	  <Folder Include="Model\Authentication\" />
+	  <Folder Include="Utility\" />
+	  <Folder Include="Services\" />
+	  <Folder Include="Services\Interfaces\" />
+	  <Folder Include="Providers\" />
+	  <Folder Include="Components\Customer\" />
+	  <Folder Include="Components\Authorization\" />
+	  <Folder Include="Pages\Clientes\" />
+	  <Folder Include="Model\Customer\" />
+	  <Folder Include="Model\User\" />
+	  <Folder Include="Pages\Users\" />
+	  <Folder Include="Components\User\" />
+	  <Folder Include="Extensions\" />
+	  <Folder Include="Model\Package\" />
+	  <Folder Include="Model\Common\" />
+	  <Folder Include="Providers\Interfaces\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Pages\Paquetes\" />
+	  <None Remove="Model\" />
+	  <None Remove="Model\Authentication\" />
+	  <None Remove="Utility\" />
+	  <None Remove="Services\" />
+	  <None Remove="Services\Interfaces\" />
+	  <None Remove="Providers\" />
+	  <None Remove="Components\Customer\" />
+	  <None Remove="Components\Authorization\" />
+	  <None Remove="Pages\Clientes\" />
+	  <None Remove="Model\Customer\" />
+	  <None Remove="Model\User\" />
+	  <None Remove="Pages\Users\" />
+	  <None Remove="Components\User\" />
+	  <None Remove="Extensions\" />
+	  <None Remove="Model\Package\" />
+	  <None Remove="Model\Common\" />
+	  <None Remove="Providers\Interfaces\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\AeroPackage.Contracts\AeroPackage.Contracts.csproj">
+	    <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+	  </ProjectReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Program.cs">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Update="wwwroot\appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="wwwroot\appsettings.Development.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+</Project>

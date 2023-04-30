@@ -1,0 +1,146 @@
+﻿@page "/usuarios/crear"
+@using AeroPackage.Contracts.User;
+@using AeroPackage.WebApp.Components.User;
+@using AeroPackage.WebApp.Model.User;
+@using FluentValidation
+@using AeroPackage.WebApp.Extensions;
+@inject NavigationManager _navigationManager
+@inject IUserService _userService;
+@attribute [Authorize(Roles = "Admin")]
+
+<AuthorizeView>
+    <Authorized>
+        <MudContainer Fixed="true">
+            <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+            <MudCard Class="mt-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Informaci&oacute;n del Usuario</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Disabled="@_processing" Icon="@Icons.Material.Filled.ChevronLeft" Variant="Variant.Filled" Color="Color.Primary" Href="/usuarios" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudForm Model="@model" @ref="@form" Validation="@(createUserValidator.ValidateValue)" ValidationDelay="0">
+                    <MudCardContent>
+                        <MudTextField @bind-Value="model.FirstName"
+                                      For="@(() => model.FirstName)"
+                                      Immediate="true"
+                                      Label="Nombre" />
+
+                        <MudTextField @bind-Value="model.LastName"
+                                      For="@(() => model.LastName)"
+                                      Immediate="true"
+                                      Label="Apellido" />
+
+
+                        <MudTextField @bind-Value="model.Email"
+                                      For="@(() => model.Email)"
+                                      Immediate="true"
+                                      Label="Email" />
+
+                        <MudTextField @bind-Value="model.Password"
+                                      For="@(() => model.Password)"
+                                      Immediate="true"
+                                      InputType="InputType.Text"
+                                      Label="Contrasena"
+                                      ReadOnly="true"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.Lock"
+                                      AdornmentAriaLabel="Generar Contrasena"
+                                      OnAdornmentClick="GenerateDefaultPassword" />
+
+
+                        <MudRadioGroup Class="my-4" @bind-SelectedOption="model.Role" For="@(() => model.Role)" Required="true">
+                            <MudRadio Color="Color.Primary" Option="@(1)">Administrador</MudRadio>
+                            <MudRadio Color="Color.Primary" Option="@(2)">Ejecutivo</MudRadio>
+                            <MudRadio Color="Color.Primary" Option="@(3)">Bodega</MudRadio>
+                        </MudRadioGroup>
+
+                    </MudCardContent>
+                </MudForm>
+                <MudCardActions>
+                    <MudCardActions Class="pa-4">
+                        <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Submit())">
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Guardando...</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Guardar</MudText>
+                            }
+                        </MudButton>
+                        &nbsp;&nbsp;
+                        <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.DeleteSweep" Variant="Variant.Filled" Color="Color.Warning" OnClick="@(()=>form.Reset())">
+                            <MudText>Limpiar</MudText>
+                        </MudButton>
+                    </MudCardActions>
+                </MudCardActions>
+            </MudCard>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+{
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Usuarios", href: "/usuarios"),
+        new BreadcrumbItem("Crear Usuarios", href: "/usuarios/crear"),
+    };
+
+    private bool _processing = false;
+    [Inject] ISnackbar Snackbar { get; set; }
+    MudForm form;
+    CreateUserDtoValidator createUserValidator = new CreateUserDtoValidator();
+    CreateUserDto model = new CreateUserDto();
+
+    void GenerateDefaultPassword()
+    {
+        model.Password = PasswordExtension.GeneratePassword(12);
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            _processing = true;
+
+            await form.Validate();
+
+            if (form.IsValid)
+            {
+                try
+                {
+                    var user = await _userService.Create(model);
+                    if (user is not null)
+                    {
+                        Snackbar.Add("Usuario registrado exitosamente.", MudBlazor.Severity.Success);
+                        _navigationManager.NavigateTo("/usuarios", forceLoad: false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add("Ocurrio un error al registrar el usuario, intenta nuevamente.", MudBlazor.Severity.Error);
+                    _processing = false;
+                }
+            }
+            else
+            {
+                _processing = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error al procesar la informacion del formulario.", MudBlazor.Severity.Error);
+            _navigationManager.NavigateTo("/usuarios", forceLoad: false);
+        }
+
+    }
+}
+
