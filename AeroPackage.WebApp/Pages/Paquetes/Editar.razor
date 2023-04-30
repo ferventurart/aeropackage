@@ -285,7 +285,20 @@
                 var packageResponse = await _packageService.GetByTrackingNumber(TrackingNumber);
                 if (packageResponse is not null)
                 {
-                    model = packageResponse.Adapt<UpdatePackageDto>();
+                    model = new UpdatePackageDto()
+                    {
+                        Id = packageResponse.Id,
+                        OwnTrackingNumber = packageResponse.OwnTrackingNumber,
+                        UserId = Guid.Parse(packageResponse.UserId),
+                        CustomerId = Guid.Parse(packageResponse.CustomerId),
+                        Store = packageResponse.Store,
+                        Courier = packageResponse.Courier,
+                        CourierTrackingNumber = packageResponse.CourierTrackingNumber,
+                        Weight = packageResponse.Weight,
+                        QuantityArticles = packageResponse.QuantityArticles,
+                        Description = packageResponse.Description,
+                        DeclaredValue = packageResponse.DeclaredValue
+                    };
                     _selectedCustomer = await _customerService.GetById(model.CustomerId);
                     _selectedStore = StoresExtension.GetStoreByName(model.Store);
                 }
