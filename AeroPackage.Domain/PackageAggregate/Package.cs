@@ -11,6 +11,7 @@ using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using static AeroPackage.Domain.Common.DomainErrors.Errors;
 using static System.Collections.Specialized.BitVector32;
 
 namespace AeroPackage.Domain.PackageAggregate;
@@ -148,6 +149,63 @@ public sealed class Package : AggregateRoot<PackageId, int>
     {
         _packageHistories.Add(PackageHistory.Create(status));
     }
+
+    public void ChangePackageStatus(PackageStatus newStatus, PackageStatus currentStatus)
+    {
+
+        if (newStatus == currentStatus)
+        {
+            return;
+        }
+
+        if (newStatus == PackageStatus.ReceivedInUsa && currentStatus == PackageStatus.PreAlert)
+        {
+            Status = newStatus;
+        }
+
+        if (newStatus == PackageStatus.PreparingForShipment && currentStatus == PackageStatus.ReceivedInUsa)
+        {
+            Status = newStatus;
+        }
+
+        if (newStatus == PackageStatus.InTransitToDestinationCountry && currentStatus == PackageStatus.PreparingForShipment)
+        {
+            Status = newStatus;
+        }
+
+        if (newStatus == PackageStatus.ReceivedAtDestinationCountry && currentStatus == PackageStatus.InTransitToDestinationCountry)
+        {
+            Status = newStatus;
+        }
+
+        if (newStatus == PackageStatus.CustomsClearanceInProcess && currentStatus == PackageStatus.ReceivedAtDestinationCountry)
+        {
+            Status = newStatus;
+        }
+
+        if (newStatus == PackageStatus.ReleasedFromCustoms && currentStatus == PackageStatus.CustomsClearanceInProcess)
+        {
+            Status = newStatus;
+        }
+
+        if (newStatus == PackageStatus.StoredInWarehouse && currentStatus == PackageStatus.ReleasedFromCustoms)
+        {
+            Status = newStatus;
+        }
+
+        if (newStatus == PackageStatus.DeliveredToLocalCourier && currentStatus == PackageStatus.StoredInWarehouse)
+        {
+            Status = newStatus;
+        }
+
+        if (newStatus == PackageStatus.Delivered && currentStatus == PackageStatus.DeliveredToLocalCourier)
+        {
+            Status = newStatus;
+        }
+
+        AddHistoryToTimeLine(newStatus.Name);
+    }
+
     #pragma warning disable CS8618
     private Package()
     {
