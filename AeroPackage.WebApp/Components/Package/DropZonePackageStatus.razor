@@ -26,9 +26,10 @@
                                              CanDrop="@((item) => item.Status == canDrop)"
                                              CanDropClass="mud-border-success"
                                              NoDropClass="mud-border-error"
-                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1">
+                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1"
+                                             Style="@($"background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(251,251,251,0.958420868347339) 100%);")">
                                     <MudListSubheader>
-                                        <MudText Color="Color.Primary">
+                                        <MudText Style="@($"font-weight: 800; color:{Colors.BlueGrey.Darken3};")">
                                             <img src="@packageStatus.Icon" height="24" width="24" style="vertical-align:middle" />
                                             &nbsp;@packageStatus.Name
                                         </MudText>
@@ -45,9 +46,10 @@
                                              CanDrop="@((item) => item.Status == canDrop)"
                                              CanDropClass="mud-border-success"
                                              NoDropClass="mud-border-error"
-                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1">
+                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1"
+                                             Style="@($"background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(251,251,251,0.958420868347339) 100%);")">
                                     <MudListSubheader>
-                                        <MudText Color="Color.Primary">
+                                        <MudText Style="@($"font-weight: 800; color:{Colors.BlueGrey.Darken3};")">
                                             <img src="@packageStatus.Icon" height="24" width="24" style="vertical-align:middle" />
                                             &nbsp;@packageStatus.Name
                                         </MudText>
@@ -64,9 +66,10 @@
                                              CanDrop="@((item) => item.Status == canDrop)"
                                              CanDropClass="mud-border-success"
                                              NoDropClass="mud-border-error"
-                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1">
+                                             Class="rounded-lg border-2 border-solid mud-border-lines-default pa-4 ma-4 flex-grow-1"
+                                             Style="@($"background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(251,251,251,0.958420868347339) 100%);")">
                                     <MudListSubheader>
-                                        <MudText Color="Color.Primary">
+                                        <MudText Style="@($"font-weight: 800; color:{Colors.BlueGrey.Darken3};")">
                                             <img src="@packageStatus.Icon" height="24" width="24" style="vertical-align:middle" />
                                             &nbsp;@packageStatus.Name
                                         </MudText>
@@ -100,6 +103,7 @@
     [Parameter]
     public List<DropPackageItemDto> Packages { get; set; }
 
+    private MudTheme Theme = new MudTheme();
 
     List<CommonPackageStatus> PackageStatuses = PackageStatusExtension.GetCommonPackageStatus();
 

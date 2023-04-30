@@ -1,4 +1,4 @@
-﻿@page "/paquetes/registrar"
+﻿@page "/paquetes/editar/{TrackingNumber}"
 @using AeroPackage.WebApp.Model.Package;
 @using AeroPackage.Contracts.Customer;
 @using AeroPackage.Contracts.Package;
@@ -7,6 +7,7 @@
 @using AeroPackage.WebApp.Extensions;
 @using System.Globalization;
 @using AeroPackage.WebApp.Providers.Interfaces;
+@using Mapster;
 @inject IAuthProvider _authProvider;
 @inject NavigationManager _navigationManager
 @inject ICustomerService _customerService;
@@ -27,7 +28,7 @@
                         <MudIconButton Disabled="@_processing" Icon="@Icons.Material.Filled.ChevronLeft" Variant="Variant.Filled" Color="Color.Primary" Href="/paquetes/buscar" />
                     </CardHeaderActions>
                 </MudCardHeader>
-                <MudForm Model="@model" @ref="@form" Validation="@(createPackageValidator.ValidateValue)" ValidationDelay="0">
+                <MudForm Model="@model" @ref="@form" Validation="@(updatePackageValidator.ValidateValue)" ValidationDelay="0">
                     <MudCardContent>
                         <MudAutocomplete T="CustomerResponse"
                                          Label="Clientes"
@@ -242,27 +243,29 @@
                 </MudCardActions>
             </MudCard>
         </MudContainer>
-
     </Authorized>
     <NotAuthorized>
         You are not authorized
     </NotAuthorized>
 </AuthorizeView>
+
 @code {
-    [Inject] ISnackbar Snackbar { get; set; }
+    [Parameter]
+    public string? TrackingNumber { get; set; }
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
 {
         new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
         new BreadcrumbItem("Paquetes", href: "/paquetes/buscar"),
-        new BreadcrumbItem("Registrar", href: "/paquetes/registrar"),
+        new BreadcrumbItem("Editar", href:null, disabled: true),
     };
 
     private bool _processing = false;
-
+    private Guid _customerId;
+    [Inject] ISnackbar Snackbar { get; set; }
     MudForm form;
-    CreatePackageDtoValidator createPackageValidator = new CreatePackageDtoValidator();
-    CreatePackageDto model = new CreatePackageDto();
+    UpdatePackageDtoValidator updatePackageValidator = new UpdatePackageDtoValidator();
+    UpdatePackageDto model = new UpdatePackageDto();
     CustomerResponse _selectedCustomer;
     CommonStore _selectedStore;
     List<CommonStore> _commonStores = StoresExtension.GetCommonStores();
@@ -272,9 +275,37 @@
     private int maxAllowedFiles = 3;
     private bool isLoading;
 
-    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => await _customerService.GetCustomersActiveByName(value);
-
-    private async Task<IEnumerable<CommonStore>> SearchStoreAsync(string value) => _commonStores.Where(s => s.Name.ToLower().Contains(value.ToLower())).ToList();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (TrackingNumber is not null)
+            {
+                var packageResponse = await _packageService.GetByTrackingNumber(TrackingNumber);
+                if (packageResponse is not null)
+                {
+                    model = packageResponse.Adapt<UpdatePackageDto>();
+                    _selectedCustomer = await _customerService.GetById(model.CustomerId);
+                    _selectedStore = StoresExtension.GetStoreByName(model.Store);
+                }
+                else
+                {
+                    Snackbar.Add("El paquete solicitado no existe.", MudBlazor.Severity.Warning);
+                    _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+                }
+            }
+            else
+            {
+                _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            Snackbar.Add("Ocurrio un error al recuperar la informacion del paquete.", MudBlazor.Severity.Error);
+            //_navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
+        }
+    }
 
     private void OnCustomerSelected(CustomerResponse customer)
     {
@@ -317,6 +348,10 @@
         return courier;
     }
 
+    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => await _customerService.GetCustomersActiveByName(value);
+
+    private async Task<IEnumerable<CommonStore>> SearchStoreAsync(string value) => _commonStores.Where(s => s.Name.ToLower().Contains(value.ToLower())).ToList();
+
     private async Task Submit()
     {
         try
@@ -334,33 +369,34 @@
                     model.Store = _selectedStore.Name;
                     model.Attachments = loadedFiles;
 
-                    var package = await _packageService.Create(model);
+                    var package = await _packageService.Update(model);
                     if (package is not null)
                     {
-                        Snackbar.Add("Paquete registrado exitosamente.", MudBlazor.Severity.Success);
+                        Snackbar.Add("Paquete actualizado exitosamente.", MudBlazor.Severity.Success);
                         _navigationManager.NavigateTo("/paquetes/buscar", forceLoad: false);
                     }
                     else
                     {
-                        Snackbar.Add("Ocurrio un error al registrar el paquete, intenta nuevamente.", MudBlazor.Severity.Warning);
+                        Snackbar.Add("Ocurrio un error al actualizar el paquete, intenta nuevamente.", MudBlazor.Severity.Warning);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Snackbar.Add("Ocurrio un error al registrar el paquete, intenta nuevamente.", MudBlazor.Severity.Error);
+                    Snackbar.Add("Ocurrio un error al actualizar el cliente, intenta nuevamente.", MudBlazor.Severity.Error);
                     _processing = false;
                 }
             }
-
-            _processing = false;
-
+            else
+            {
+                _processing = false;
+            }
         }
         catch (Exception ex)
         {
-            Console.Write(ex);
             Snackbar.Add("Ocurrio un error al procesar la informacion del formulario.", MudBlazor.Severity.Error);
             _navigationManager.NavigateTo("/clientes", forceLoad: false);
         }
 
     }
 }
+

@@ -160,6 +160,52 @@ public class PackageService : IPackageService
         return packages;
     }
 
+    public async Task<PackageResponse> Update(UpdatePackageDto package)
+    {
+        try
+        {
+            using var content = new MultipartFormDataContent();
+
+            // Agregamos cada archivo al objeto FormData personalizado
+            foreach (var file in package.Attachments)
+            {
+                var fileContent = new StreamContent(file.OpenReadStream());
+                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "Attachments",
+                    FileName = file.Name
+                };
+
+                content.Add(fileContent, "Attachments", file.Name);
+            }
+
+            content.Add(new StringContent(package.UserId.ToString()), "UserId");
+            content.Add(new StringContent(package.CustomerId.ToString()), "CustomerId");
+            content.Add(new StringContent(package.Store), "Store");
+            content.Add(new StringContent(package.Courier), "Courier");
+            content.Add(new StringContent(package.CourierTrackingNumber), "CourierTrackingNumber");
+            content.Add(new StringContent(package.Weight.ToString()), "Weight");
+            content.Add(new StringContent(package.QuantityArticles.ToString()), "QuantityArticles");
+            content.Add(new StringContent(package.Description), "Description");
+            content.Add(new StringContent(package.DeclaredValue.ToString()), "DeclaredValue");
+
+            var response = await _httpClient.PutAsJsonAsync($"api/packages/{package.Id}", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new ApplicationException($"Reason: {response.ReasonPhrase}, Message: {responseContent}");
+
+            var packageResponse = JsonSerializer.Deserialize<PackageResponse>(responseContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return packageResponse;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return null;
+        }
+    }
+
     public async Task<bool> UpdateStatus(UpdateStatusPackageDto package)
     {
         var response = await _httpClient.PutAsJsonAsync($"api/packages/update-status/{package.OwnTrackingNumber}", package);

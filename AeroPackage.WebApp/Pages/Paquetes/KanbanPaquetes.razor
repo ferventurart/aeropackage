@@ -51,9 +51,9 @@
                 </ChildContent>
             </MudExpansionPanel>
         </MudExpansionPanels>
-
-        <DropZonePackageStatus Packages="@_packages"></DropZonePackageStatus>
-
+        <MudCard Class="mt-6">
+            <DropZonePackageStatus Packages="@_packages"></DropZonePackageStatus>
+        </MudCard>
     </Authorized>
     <NotAuthorized>
         You are not authorized
@@ -63,7 +63,7 @@
 
     [Inject] ISnackbar Snackbar { get; set; }
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {   
+{
         new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
         new BreadcrumbItem("Paquetes", href: "/paquetes/buscar"),
         new BreadcrumbItem("Buscar", href: "/paquetes/buscar"),

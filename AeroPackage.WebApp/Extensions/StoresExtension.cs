@@ -44,5 +44,10 @@ public static class StoresExtension
     {
         return GetCommonStores().Single(s => s.Name == name).UrlLogo;
     }
+
+    public static CommonStore GetStoreByName(string name)
+    {
+        return GetCommonStores().Single(s => s.Name == name);
+    }
 }
 

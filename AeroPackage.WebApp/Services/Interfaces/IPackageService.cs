@@ -15,6 +15,7 @@ public interface IPackageService
     Task<PackageResponse> GetById(int Id);
     Task<PackageResponse> GetByTrackingNumber(string trackingNumber);
     Task<PackageResponse> Create(CreatePackageDto package);
+    Task<PackageResponse> Update(UpdatePackageDto package);
     Task<bool> UpdateStatus(UpdateStatusPackageDto package);
     Task<PackageResponse> Delete(int Id);
 }

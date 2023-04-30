@@ -85,6 +85,7 @@
                     <MudTh>Descripcion</MudTh>
                     <MudTh>Peso (Lbs)</MudTh>
                     <MudTh>Monto Compra</MudTh>
+                    <MudTh>Opciones</MudTh>
                 </HeaderContent>
                 <RowTemplate Context="package">
                     <MudTd DataLabel="AeroShopTrack"><MudLink Target="_blank" Href="@($"/paquetes/ver/{package.OwnTrackingNumber}")">@package.OwnTrackingNumber</MudLink></MudTd>
@@ -93,6 +94,11 @@
                     <MudTd DataLabel="Descripcion">@package.Description</MudTd>
                     <MudTd DataLabel="Peso (Lbs)">@package.Weight</MudTd>
                     <MudTd DataLabel="Monto Compra">@package.DeclaredValue.ToString("C", CultureInfo.CurrentCulture)</MudTd>
+                    <MudTd DataLabel="Opciones">
+                        <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">
+                            <MudIconButton Href="@($"/paquetes/editar/{package.OwnTrackingNumber}")" Icon="@Icons.Material.Filled.Edit" Color="@Color.Surface" />
+                        </MudButtonGroup>
+                    </MudTd>
                 </RowTemplate>
                 <LoadingContent>
                     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
