@@ -177,71 +177,39 @@
                 <MudItem xs="12" sm="12">
                     <MudText Typo="Typo.subtitle1" Class="ml-2" Color="Color.Info">Archivos Adjuntos</MudText>
                     <br />
-                    <MudPaper Elevation="3">
-                        <MudCard>
-                            <MudCardContent>
-                                @if (model.Attachments != null && model.Attachments.Count > 0)
+                    <MudPaper Elevation="3" Class="pa-4">
+                        <MudGrid>
+                            @if (model.Attachments != null && model.Attachments.Count > 0)
+                            {
+                                @foreach (var file in model.Attachments)
                                 {
-                                    <MudList>
-                                        @foreach (var file in model.Attachments)
-                                        {
-                                            var extension = Path.GetExtension(file).ToLower();
-                                            <MudListItem @key="@file">
+                                    var extension = Path.GetExtension(file).ToLower();
+                                    <MudItem xs="12" sm="6" md="4">
+                                        <MudPaper Elevation="2" Class="pa-2" Style="height: 80px;">
+                                            <MudStack Row="true" Class="ml-3 mt-1">
                                                 @if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" || extension == ".bmp")
                                                 {
-                                                    <MudCard>
-                                                        <MudCardHeader>
-                                                            <CardHeaderAvatar>
-                                                                <MudAvatar Color="Color.Secondary">
-                                                                    <MudIcon Icon="@Icons.Material.Filled.Image"></MudIcon>
-                                                                </MudAvatar>
-                                                            </CardHeaderAvatar>
-                                                            <CardHeaderContent>
-                                                                <MudText Typo="Typo.body1">Imagen</MudText>
-                                                            </CardHeaderContent>
-                                                            <CardHeaderActions>
-                                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="(async () => await DeleteAttachmentAsync(model.Id, model.OwnTrackingNumber, file))" Color="Color.Error" />
-                                                                <MudIconButton Target="_blank" Href="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Icon="@Icons.Material.Filled.ImageSearch" Color="Color.Primary" />
-                                                            </CardHeaderActions>
-                                                        </MudCardHeader>
-                                                        <MudCardMedia Image="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Height="300" />
-                                                        <MudCardContent>
-                                                            <MudText Typo="Typo.body2">@file</MudText>
-                                                        </MudCardContent>
-                                                    </MudCard>
+                                                    <MudImage Src="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Width="62" Height="62"></MudImage>
                                                 }
                                                 else
                                                 {
-                                                    <MudCard>
-                                                        <MudCardHeader>
-                                                            <CardHeaderAvatar>
-                                                                <MudAvatar Color="Color.Error">
-                                                                    <MudIcon Icon="@Icons.Custom.FileFormats.FilePdf"></MudIcon>
-                                                                </MudAvatar>
-                                                            </CardHeaderAvatar>
-                                                            <CardHeaderContent>
-                                                                <MudText Typo="Typo.body1">PDF</MudText>
-                                                            </CardHeaderContent>
-                                                            <CardHeaderActions>
-                                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="(async () => await DeleteAttachmentAsync(model.Id, model.OwnTrackingNumber, file))" Color="Color.Error" />
-                                                                <MudIconButton Target="_blank" Href="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")" Icon="@Icons.Material.Filled.ZoomOutMap" Color="Color.Primary" />
-                                                            </CardHeaderActions>
-                                                        </MudCardHeader>
-                                                        <MudCardContent>
-                                                            <MudText Typo="Typo.body2">@file</MudText>
-                                                        </MudCardContent>
-                                                    </MudCard>
+                                                    <MudIcon Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" Style="font-size: 3rem;" />
                                                 }
-                                            </MudListItem>
-                                        }
-                                    </MudList>
+                                                <MudStack Justify="Justify.Center" Spacing="0">
+                                                    <MudText Typo="Typo.caption" Class="ml-2"><MudLink Href="@($"{@Configuration["ApiUrl"]}uploads/{TrackingNumber}/{file}")">@file</MudLink></MudText>
+                                                </MudStack>
+                                            </MudStack>
+                                        </MudPaper>
+                                    </MudItem>
                                 }
-                                else
-                                {
+                            }
+                            else
+                            {
+                                <MudItem xxl="12" sm="12" md="12">
                                     <MudAlert Severity="Severity.Info">El paquete no tiene archivos adjuntos.</MudAlert>
-                                }
-                            </MudCardContent>
-                        </MudCard>
+                                </MudItem>
+                            }
+                        </MudGrid>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
