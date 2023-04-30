@@ -18,6 +18,9 @@ using AeroPackage.Application.Packages.Queries.GetPackageByOwnTracker;
 using AeroPackage.Application.Packages.Queries.GetPackagesByPeriodStatusAndStore;
 using AeroPackage.Application.Packages.Queries.GetPackagesByPeriodAndStore;
 using AeroPackage.Application.Packages.Commands.UpdatePackageStatus;
+using AeroPackage.Application.Customers.Commands.UpdateCustomer;
+using AeroPackage.Contracts.Customer;
+using AeroPackage.Application.Packages.Commands.UpdatePackage;
 
 namespace AeroPackage.Api.Controllers;
 
@@ -154,7 +157,51 @@ public class PackagesController : ApiController
         }
 
         return createPackageResult.Match(
-            customer => Ok(_mapper.Map<PackageResponse>(customer)),
+            package => Ok(_mapper.Map<PackageResponse>(package)),
+            errors => Problem(errors));
+    }
+
+    /// <summary>
+    /// Update Package
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPut("{id}")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Update(int id, [FromForm] UpdatePackageRequest request)
+    {
+        if (id != request.Id)
+        {
+            List<Error> errors = new();
+            errors.Add(Error.Validation("PackageId", "Url Id is not equal than Request Id."));
+            return Problem(errors);
+        }
+
+        List<string> attachmentsUrls = new();
+
+        if (request.Attachments is not null && request.Attachments.Count > 0)
+        {
+            attachmentsUrls = await _fileHandler.UploadFilesToApi(request.Attachments, request.OwnTrackingNumber);
+        }
+
+        var command = new UpdatePackageCommand(
+                   request.Id,
+                   request.UserId,
+                   request.CustomerId,
+                   request.Store,
+                   request.Courier,
+                   request.CourierTrackingNumber,
+                   request.Weight,
+                   request.QuantityArticles,
+                   request.Description,
+                   request.DeclaredValue,
+                   attachmentsUrls);
+
+        var updatePackageResult = await _mediator.Send(command);
+
+        return updatePackageResult.Match(
+            package => Ok(_mapper.Map<PackageResponse>(package)),
             errors => Problem(errors));
     }
 

@@ -91,8 +91,7 @@ public sealed class Package : AggregateRoot<PackageId, int>
         PackageStatus status,
         List<PackageHistory>? packageHistories = null)
     {
-        decimal taxValue = declaredValue > 150 ? declaredValue * 0.30m : declaredValue * 0.13m;
-
+        
         return new Package(packageId,
             ownTrackingNumber,
             userId,
@@ -105,7 +104,7 @@ public sealed class Package : AggregateRoot<PackageId, int>
             quantityArticles,
             description,
             declaredValue,
-            taxValue,
+            CalcualateTax(declaredValue),
             status,
             packageHistories ?? new());
     }
@@ -142,6 +141,14 @@ public sealed class Package : AggregateRoot<PackageId, int>
         if (_attachments.Contains(fileName))
         {
             _attachments.Remove(fileName);
+        }
+    }
+
+    public void ClearAttachments()
+    {
+        if (_attachments.Count > 0)
+        {
+            _attachments.Clear();
         }
     }
 
@@ -206,7 +213,18 @@ public sealed class Package : AggregateRoot<PackageId, int>
         AddHistoryToTimeLine(newStatus.Name);
     }
 
-    #pragma warning disable CS8618
+    public static decimal CalcualateTax(decimal declaredValue)
+    {
+        return declaredValue > 150 ? declaredValue * 0.30m : declaredValue * 0.13m;
+    }
+
+    public void UdpateTaxValue(decimal declaredValue)
+    {
+       TaxValue = declaredValue > 150 ? declaredValue * 0.30m : declaredValue * 0.13m;
+    }
+
+
+#pragma warning disable CS8618
     private Package()
     {
     }

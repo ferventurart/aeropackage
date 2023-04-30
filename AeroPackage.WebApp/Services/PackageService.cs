@@ -179,6 +179,8 @@ public class PackageService : IPackageService
                 content.Add(fileContent, "Attachments", file.Name);
             }
 
+            content.Add(new StringContent(package.Id.ToString()), "Id");
+            content.Add(new StringContent(package.OwnTrackingNumber), "OwnTrackingNumber");
             content.Add(new StringContent(package.UserId.ToString()), "UserId");
             content.Add(new StringContent(package.CustomerId.ToString()), "CustomerId");
             content.Add(new StringContent(package.Store), "Store");
@@ -189,7 +191,7 @@ public class PackageService : IPackageService
             content.Add(new StringContent(package.Description), "Description");
             content.Add(new StringContent(package.DeclaredValue.ToString()), "DeclaredValue");
 
-            var response = await _httpClient.PutAsJsonAsync($"api/packages/{package.Id}", content);
+            var response = await _httpClient.PutAsync($"api/packages/{package.Id}", content);
             var responseContent = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)

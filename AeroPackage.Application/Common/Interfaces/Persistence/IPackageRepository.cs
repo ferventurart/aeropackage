@@ -22,6 +22,8 @@ public interface IPackageRepository
 
     bool ExistsWithTrackingNumber(string trackingNumber);
 
+    Package? GetPackageByTrackingNumber(string trackingNumber);
+
     bool Exists(PackageId packageId);
 
     Package? GetPackageById(PackageId packageId);

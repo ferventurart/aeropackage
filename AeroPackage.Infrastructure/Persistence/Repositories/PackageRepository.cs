@@ -63,6 +63,10 @@ public class PackageRepository : IPackageRepository
         _dbContext.Packages
                   .FirstOrDefault(package => package.OwnTrackingNumber == ownTrackingNumber);
 
+    public Package? GetPackageByTrackingNumber(string trackingNumber) =>
+        _dbContext.Packages
+                  .FirstOrDefault(package => package.CourierTrackingNumber == trackingNumber);
+
     public async Task<PaginatedResult<Package>> GetPackagesByPeriod(DateTime from, DateTime to, PackageStatus status, List<string> stores, int pageSize, int pageNumber) =>
         await _dbContext.Packages
                 .AsTracking()

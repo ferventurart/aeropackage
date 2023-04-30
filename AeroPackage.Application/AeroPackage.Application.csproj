@@ -48,6 +48,7 @@
     <None Remove="Packages\Commands\AssignPackage\" />
     <None Remove="Packages\Events\" />
     <None Remove="Packages\Commands\UpdatePackageStatus\" />
+    <None Remove="Packages\Commands\UpdatePackage\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Customers\" />
@@ -79,5 +80,6 @@
     <Folder Include="Packages\Commands\AssignPackage\" />
     <Folder Include="Packages\Events\" />
     <Folder Include="Packages\Commands\UpdatePackageStatus\" />
+    <Folder Include="Packages\Commands\UpdatePackage\" />
   </ItemGroup>
 </Project>
