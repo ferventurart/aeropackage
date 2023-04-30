@@ -1,11 +1,136 @@
 ﻿@page "/dashboard"
-@attribute [Authorize (Roles = "Admin")]
+@using System.Globalization;
+@attribute [Authorize(Roles = "Admin")]
 
 <AuthorizeView>
     <Authorized>
-     
+        <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+            @*<MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudExpansionPanels>
+                        <MudExpansionPanel Dense="true">
+                            <TitleContent>
+                                <div class="d-flex">
+                                    <MudIcon Icon="@Icons.Material.Filled.FilterAlt" class="mr-3"></MudIcon>
+                                    <MudText>Filtra <strong>Dashboard</strong></MudText>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudDateRangePicker @ref="_picker"
+                                                    @bind-DateRange="_dateRange"
+                                                    Label="Filtrar por Fechas"
+                                                    HelperText="Seleccione un periodo de tiempo"
+                                                    DateFormat="dd/MM/yyyy"
+                                                    TitleDateFormat="dddd, dd. MMMM"
+                                                    Culture="@CultureInfo.GetCultureInfo("es-ES")">
+                                </MudDateRangePicker>
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    </MudExpansionPanels>
+                </MudItem>
+            </MudGrid>*@
+            <MudGrid>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="2" Class="pa-2" Style="height: 80px;">
+                        <MudStack Row="true" Class="ml-3 mt-1">
+                            <MudIcon Icon="fa-solid fa-sack-dollar" Color="Color.Success" Style="font-size: 3rem;" />
+                            <MudStack Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.caption" Class="ml-2">Ingresos</MudText>
+                                <MudText Typo="Typo.h6" Class="ml-2" Style="font-weight: 500">$1,000.00</MudText>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="2" Class="pa-2" Style="height: 80px;">
+                        <MudStack Row="true" Class="ml-3 mt-1">
+                            <MudIcon Icon="fa-solid fa-plane" Color="Color.Warning" Style="font-size: 3rem;" />
+                            <MudStack Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.caption" Class="ml-2">Paquetes en Transito</MudText>
+                                <MudText Typo="Typo.h6" Class="ml-2" Style="font-weight: 500">45</MudText>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="2" Class="pa-2" Style="height: 80px;">
+                        <MudStack Row="true" Class="ml-3 mt-1">
+                            <MudIcon Icon="fa-solid fa-warehouse" Color="Color.Primary" Style="font-size: 3rem;" />
+                            <MudStack Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.caption" Class="ml-2">Paquetes en Bodega</MudText>
+                                <MudText Typo="Typo.h6" Class="ml-2" Style="font-weight: 500">230</MudText>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="2" Class="pa-2" Style="height: 80px;">
+                        <MudStack Row="true" Class="ml-3 mt-1">
+                            <MudIcon Icon="fa-solid fa-truck-fast" Color="Color.Info" Style="font-size: 3rem;" />
+                            <MudStack Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.caption" Class="ml-2">Paquetes en Entrega</MudText>
+                                <MudText Typo="Typo.h6" Class="ml-2" Style="font-weight: 500">125</MudText>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
+                        <MudText Typo="Typo.h5" Color="Color.Primary" Align="Align.Center">Importaciones del a&ntilde;o</MudText>
+                        <div>
+                            <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
+                        <!-- Grafico Circular-->
+                        <MudText Typo="Typo.h5" Color="Color.Primary" Align="Align.Center">Tiendas Preferidas</MudText>
+                        <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Top" Width="300px" Height="300px"
+                                  InputData="@data" InputLabels="@labels">
+                            <CustomGraphics>
+                                <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Total</text>
+                                <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@data.Sum().ToString()</text>
+                            </CustomGraphics>
+                        </MudChart>
+                    </MudPaper>
+                </MudItem>
+                @*<MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">Ultimos Clientes Registrados</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">Ultimos Paquetes Registrados</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>*@
+            </MudGrid>
+        </MudContainer>
     </Authorized>
     <NotAuthorized>
         You are not authorized
     </NotAuthorized>
 </AuthorizeView>
+
+@code
+{
+    private MudDateRangePicker _picker;
+    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+
+    public double[] data = { 77, 25, 28, 5 };
+    public string[] labels = { "Amazon", "eBay", "Shein", "AliExpress" };
+
+    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+
+    public List<ChartSeries> Series = new List<ChartSeries>()
+{
+        new ChartSeries() { Name = "Amazon", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
+        new ChartSeries() { Name = "eBay", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
+        new ChartSeries() { Name = "Shein", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
+    };
+    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+}

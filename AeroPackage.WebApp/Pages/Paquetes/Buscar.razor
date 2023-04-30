@@ -128,7 +128,7 @@
     private PackageResponse _selectedPackage = null;
     private PaginatedResult<PackageResponse> _packages = new();
     private string _packageStatus = "PreAlert";
-    public string _packageStore { get; set; } = "Amazon";
+    public string _packageStore { get; set; } = "Amazon,eBay,Shein,AliExpress";
     private bool disabledFilterButton = false;
 
     private async Task<TableData<PackageResponse>> ServerReload(TableState state)
