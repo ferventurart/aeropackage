@@ -9,35 +9,26 @@ public static class StoresExtension
     {
         return new List<CommonStore>()
         {
-            new CommonStore() { Name = "Amazon", UrlLogo = GetSquareLogoUrl("amazon.com") },
-            new CommonStore() { Name = "eBay", UrlLogo = GetSquareLogoUrl("ebay.com") },
-            new CommonStore() { Name = "Walmart", UrlLogo = GetSquareLogoUrl("walmart.com") },
-            new CommonStore() { Name = "AliExpress", UrlLogo = GetSquareLogoUrl("aliexpress.com") },
-            new CommonStore() { Name = "Best Buy", UrlLogo = GetSquareLogoUrl("bestbuy.com") },
-            new CommonStore() { Name = "Target", UrlLogo = GetSquareLogoUrl("target.com") },
-            new CommonStore() { Name = "Zappos", UrlLogo = GetSquareLogoUrl("zappos.com") },
-            new CommonStore() { Name = "ASOS", UrlLogo = GetSquareLogoUrl("asos.com") },
-            new CommonStore() { Name = "Zara", UrlLogo = GetSquareLogoUrl("zara.com") },
-            new CommonStore() { Name = "Adidas", UrlLogo = GetSquareLogoUrl("adidas.com") },
-            new CommonStore() { Name = "Nike", UrlLogo = GetSquareLogoUrl("nike.com") },
-            new CommonStore() { Name = "Forever 21", UrlLogo = GetSquareLogoUrl("forever21.com") },
-            new CommonStore() { Name = "Macy's", UrlLogo = GetSquareLogoUrl("macys.com") },
-            new CommonStore() { Name = "Nordstrom", UrlLogo = GetSquareLogoUrl("nordstrom.com") },
-            new CommonStore() { Name = "Gap", UrlLogo = GetSquareLogoUrl("gap.com") },
-            new CommonStore() { Name = "H&M", UrlLogo = GetSquareLogoUrl("hm.com") },
-            new CommonStore() { Name = "Uniqlo", UrlLogo = GetSquareLogoUrl("uniqlo.com") },
-            new CommonStore() { Name = "Lululemon", UrlLogo = GetSquareLogoUrl("lululemon.com") },
-            new CommonStore() { Name = "Sephora", UrlLogo = GetSquareLogoUrl("sephora.com") },
-            new CommonStore() { Name = "Ulta Beauty", UrlLogo = GetSquareLogoUrl("ulta.com") },
-            new CommonStore() { Name = "Victoria's Secret", UrlLogo = GetSquareLogoUrl("victoriassecret.com") },
-            new CommonStore() { Name = "Gymshark", UrlLogo = GetSquareLogoUrl("gymshark.com") },
-            new CommonStore() { Name = "Shein", UrlLogo = GetSquareLogoUrl("shein.com") },
+            new CommonStore() { Name = "Apple", UrlLogo = @"img/apple.svg" },
+            new CommonStore() { Name = "Amazon", UrlLogo = @"img/amazon.svg" },
+            new CommonStore() { Name = "eBay", UrlLogo =  @"img/ebay.svg" },
+            new CommonStore() { Name = "Walmart", UrlLogo = @"img/walmart.svg" },
+            new CommonStore() { Name = "AliExpress", UrlLogo =  @"img/aliexpress.svg" },
+            new CommonStore() { Name = "Best Buy", UrlLogo = @"img/best-buy.svg" },
+            new CommonStore() { Name = "Target", UrlLogo =  @"img/target.svg" },
+            new CommonStore() { Name = "Zara", UrlLogo = @"img/zara.svg"  },
+            new CommonStore() { Name = "Adidas", UrlLogo = @"img/adidas.svg" },
+            new CommonStore() { Name = "Nike", UrlLogo = @"img/nike.svg"  },
+            new CommonStore() { Name = "Forever 21", UrlLogo = @"img/forever-21.svg" },
+            new CommonStore() { Name = "Macy's", UrlLogo =  @"img/macys.svg" },
+            new CommonStore() { Name = "Nordstrom", UrlLogo = @"img/nordstrom.svg" },
+            new CommonStore() { Name = "Gap", UrlLogo = @"img/gap.svg"},
+            new CommonStore() { Name = "H&M", UrlLogo =  @"img/h&m.svg" },
+            new CommonStore() { Name = "Sephora", UrlLogo = @"img/sephora.svg" },
+            new CommonStore() { Name = "Victoria's Secret", UrlLogo = @"img/victoria-secret.svg" },
+            new CommonStore() { Name = "Gymshark", UrlLogo =  @"img/gymshark.svg" },
+            new CommonStore() { Name = "Shein", UrlLogo =  @"img/shein.svg" },
         };
-    }
-
-    private static string GetSquareLogoUrl(string domain)
-    {
-        return $"https://logo.clearbit.com/{domain}?size=28";
     }
 
     public static string GetLogoOfCommonStoreByName(string name)

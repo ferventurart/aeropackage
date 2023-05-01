@@ -13,7 +13,7 @@
     @foreach (var store in _commonStores)
     {
         <MudSelectItem Value="@store.Name">
-            <img src="@store.UrlLogo" style="vertical-align:middle" /> @store.Name
+            <img src="@store.UrlLogo" width="24" height="24" style="vertical-align:middle" /> @store.Name
         </MudSelectItem>
     }
 </MudSelect>
