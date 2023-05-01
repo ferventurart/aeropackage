@@ -1,0 +1,127 @@
+﻿@page  "/usuarios/mi-perfil"
+@using AeroPackage.WebApp.Model.User;
+@using AeroPackage.WebApp.Providers.Interfaces;
+@using Mapster;
+@inject IAuthProvider _authProvider
+@inject NavigationManager _navigationManager
+@inject IUserService _userService
+@attribute [Authorize(Roles = "Admin,Executive,Warehouse")]
+
+<AuthorizeView>
+    <Authorized>
+        <MudContainer Fixed="true">
+            <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+            <MudGrid>
+                <MudItem xs="12" sm="4">
+                    <MudPaper Elevation="2" Class="pa-4">
+                        <MudCard>
+                            <MudCardHeader Class="mud-background-gray">
+                                <CardHeaderContent>
+                                    <MudText Align="Align.Center" Typo="Typo.body2">Foto de Perfil</MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent Class="d-flex justify-content-center">
+                                <MudImage Class="d-block" Style="margin: 0 auto;" Width="200" Height="200" Fluid="true" Src="img/user.png"></MudImage>
+                            </MudCardContent>
+                            <MudCardActions Class="d-flex align-center flex-grow-1 gap-4 pa-4">
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" Class="d-flex flex-1">Cambiar</MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="8">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
+                        <MudCard>
+                            <MudCardHeader Class="mud-background-gray">
+                                <CardHeaderContent>
+                                    <MudText Align="Align.Center" Typo="Typo.body2">Informacion del Usuario</MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudTextField @bind-Value="model.FirstName"
+                                              For="@(() => model.FirstName)"
+                                              Immediate="true"
+                                              Label="Nombre" />
+
+                                <MudTextField Class="mt-2"
+                                              @bind-Value="model.LastName"
+                                              For="@(() => model.LastName)"
+                                              Immediate="true"
+                                              Label="Apellido" />
+
+
+                                <MudTextField Class="mt-2"
+                                              @bind-Value="model.Email"
+                                              For="@(() => model.Email)"
+                                              Immediate="true"
+                                              Label="Email" />
+
+                                <MudTextField Class="mt-2"
+                                              @bind-Value="model.Password"
+                                              For="@(() => model.Password)"
+                                              Immediate="true"
+                                              Label="Password"
+                                              InputType="InputType.Password" />
+
+                                <MudTextField Class="mt-2"
+                                              @bind-Value="model.Password"
+                                              For="@(() => model.Password)"
+                                              Immediate="true"
+                                              Label="Confirmar Password"
+                                              InputType="InputType.Password" />
+
+                            </MudCardContent>
+                            <MudCardActions Class="d-flex align-center flex-grow-1 gap-4 pa-4">
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" Class="d-flex flex-1">Guardar</MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+{
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Usuarios", href: "/usuarios"),
+        new BreadcrumbItem("Mi Perfil", href:null, disabled: true),
+    };
+
+    private bool _processing = false;
+    private Guid _userId;
+    [Inject] ISnackbar Snackbar { get; set; }
+    MudForm form;
+    UpdateUserDtoValidator updateUserValidator = new UpdateUserDtoValidator();
+    UpdateUserDto model = new UpdateUserDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            _userId = await _authProvider.GetCurrentUserId();
+            var userResponse = await _userService.GetById(_userId);
+            if (userResponse is not null)
+            {
+                model = userResponse.Adapt<UpdateUserDto>();
+            }
+            else
+            {
+                Snackbar.Add("El usuario solicitado no existe.", MudBlazor.Severity.Warning);
+                _navigationManager.NavigateTo("/dashboard", forceLoad: false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error al recuperar la informacion del usuario.", MudBlazor.Severity.Error);
+            _navigationManager.NavigateTo("/dashboard", forceLoad: false);
+        }
+    }
+}
+

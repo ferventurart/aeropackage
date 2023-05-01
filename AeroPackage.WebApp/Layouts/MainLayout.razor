@@ -19,7 +19,7 @@
                         <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">@context.User.Identity.Name</MudChip>
                     </ActivatorContent>
                     <ChildContent>
-                        <MudMenuItem Icon="fa-solid fa-id-badge">Perfil</MudMenuItem>
+                        <MudMenuItem Href="usuarios/mi-perfil" Icon="fa-solid fa-id-badge">Perfil</MudMenuItem>
                         <MudMenuItem Icon="fa-solid fa-right-from-bracket" OnClick="@(async () => await LogoutAsync())">Salir</MudMenuItem>
                     </ChildContent>
                 </MudMenu>
