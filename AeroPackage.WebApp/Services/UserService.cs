@@ -87,5 +87,18 @@ public class UserService : IUserService
 
         return user;
     }
+
+    public async Task<UserResponse> UpdateProfile(UpdateUserProfileDto user)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/users/{user.Id}/profile", user);
+        var content = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+            throw new ApplicationException($"Reason: {response.ReasonPhrase}, Message: {content}");
+
+        var userResponse = JsonSerializer.Deserialize<UserResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        return userResponse;
+    }
 }
 

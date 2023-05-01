@@ -3,6 +3,7 @@
 @using AeroPackage.WebApp.Providers.Interfaces;
 @using Mapster;
 @inject IAuthProvider _authProvider
+@inject IAuthenticationService _authService
 @inject NavigationManager _navigationManager
 @inject IUserService _userService
 @attribute [Authorize(Roles = "Admin,Executive,Warehouse")]
@@ -38,41 +39,52 @@
                                 </CardHeaderContent>
                             </MudCardHeader>
                             <MudCardContent>
-                                <MudTextField @bind-Value="model.FirstName"
-                                              For="@(() => model.FirstName)"
-                                              Immediate="true"
-                                              Label="Nombre" />
+                                <MudForm Model="@model" @ref="@form" Validation="@(updateUserValidator.ValidateValue)" ValidationDelay="0">
+                                    <MudTextField @bind-Value="model.FirstName"
+                                                  For="@(() => model.FirstName)"
+                                                  Immediate="true"
+                                                  Label="Nombre" />
 
-                                <MudTextField Class="mt-2"
-                                              @bind-Value="model.LastName"
-                                              For="@(() => model.LastName)"
-                                              Immediate="true"
-                                              Label="Apellido" />
+                                    <MudTextField Class="mt-2"
+                                                  @bind-Value="model.LastName"
+                                                  For="@(() => model.LastName)"
+                                                  Immediate="true"
+                                                  Label="Apellido" />
 
 
-                                <MudTextField Class="mt-2"
-                                              @bind-Value="model.Email"
-                                              For="@(() => model.Email)"
-                                              Immediate="true"
-                                              Label="Email" />
+                                    <MudTextField Class="mt-2"
+                                                  @bind-Value="model.Email"
+                                                  Label="Email"
+                                                  ReadOnly="true"
+                                                  Disabled="true" />
 
-                                <MudTextField Class="mt-2"
-                                              @bind-Value="model.Password"
-                                              For="@(() => model.Password)"
-                                              Immediate="true"
-                                              Label="Password"
-                                              InputType="InputType.Password" />
+                                    <MudTextField Class="mt-2"
+                                                  @bind-Value="model.Password"
+                                                  For="@(() => model.Password)"
+                                                  Immediate="true"
+                                                  Label="Password"
+                                                  InputType="InputType.Password" />
 
-                                <MudTextField Class="mt-2"
-                                              @bind-Value="model.Password"
-                                              For="@(() => model.Password)"
-                                              Immediate="true"
-                                              Label="Confirmar Password"
-                                              InputType="InputType.Password" />
-
+                                    <MudTextField Class="mt-2"
+                                                  @bind-Value="model.ConfirmPassword"
+                                                  For="@(() => model.ConfirmPassword)"
+                                                  Immediate="true"
+                                                  Label="Confirmar Password"
+                                                  InputType="InputType.Password" />
+                                </MudForm>
                             </MudCardContent>
                             <MudCardActions Class="d-flex align-center flex-grow-1 gap-4 pa-4">
-                                <MudButton Variant="Variant.Filled" Color="Color.Success" Class="d-flex flex-1">Guardar</MudButton>
+                                <MudButton Class="d-flex flex-1" Disabled="@_processing" StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Submit())">
+                                    @if (_processing)
+                                    {
+                                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                        <MudText Class="ms-2">Guardando...</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText>Guardar</MudText>
+                                    }
+                                </MudButton>
                             </MudCardActions>
                         </MudCard>
                     </MudPaper>
@@ -89,7 +101,6 @@
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
 {
         new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
-        new BreadcrumbItem("Usuarios", href: "/usuarios"),
         new BreadcrumbItem("Mi Perfil", href:null, disabled: true),
     };
 
@@ -97,8 +108,8 @@
     private Guid _userId;
     [Inject] ISnackbar Snackbar { get; set; }
     MudForm form;
-    UpdateUserDtoValidator updateUserValidator = new UpdateUserDtoValidator();
-    UpdateUserDto model = new UpdateUserDto();
+    UpdateUserProfileDtoValidator updateUserValidator = new UpdateUserProfileDtoValidator();
+    UpdateUserProfileDto model = new UpdateUserProfileDto();
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,7 +120,7 @@
             var userResponse = await _userService.GetById(_userId);
             if (userResponse is not null)
             {
-                model = userResponse.Adapt<UpdateUserDto>();
+                model = userResponse.Adapt<UpdateUserProfileDto>();
             }
             else
             {
@@ -122,6 +133,47 @@
             Snackbar.Add("Ocurrio un error al recuperar la informacion del usuario.", MudBlazor.Severity.Error);
             _navigationManager.NavigateTo("/dashboard", forceLoad: false);
         }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            _processing = true;
+
+            await form.Validate();
+
+            if (form.IsValid)
+            {
+                try
+                {
+                    model.Id = _userId;
+                    var user = await _userService.UpdateProfile(model);
+                    if (user is not null)
+                    {
+                        if (!string.IsNullOrEmpty(model.Password) && !string.IsNullOrEmpty(model.ConfirmPassword))
+                        {
+                            await _authService.Logout();
+                            _navigationManager.NavigateTo("/", forceLoad: true);
+                        }
+                        Snackbar.Add("Usuario actualizado exitosamente.", MudBlazor.Severity.Success);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add("Ocurrio un error al actualizar el usuario, intenta nuevamente.", MudBlazor.Severity.Error);
+                    _processing = false;
+                }
+            }
+            _processing = false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            Snackbar.Add("Ocurrio un error al procesar la informacion del formulario.", MudBlazor.Severity.Error);
+            _processing = false;
+        }
+
     }
 }
 

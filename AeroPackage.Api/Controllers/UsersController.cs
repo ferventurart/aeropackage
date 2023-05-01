@@ -2,6 +2,7 @@
 using AeroPackage.Application.Common.Models;
 using AeroPackage.Application.Users.Commands.CreateUser;
 using AeroPackage.Application.Users.Commands.DeleteUser;
+using AeroPackage.Application.Users.Commands.UpdateProfile;
 using AeroPackage.Application.Users.Commands.UpdateUser;
 using AeroPackage.Application.Users.Queries.GetUserById;
 using AeroPackage.Application.Users.Queries.GetUsers;
@@ -98,6 +99,31 @@ public class UsersController : ApiController
         }
 
         var command = _mapper.Map<UpdateUserCommand>((request));
+
+        var updateUserResult = await _mediator.Send(command);
+
+        return updateUserResult.Match(
+            user => Ok(_mapper.Map<UserResponse>(user)),
+            errors => Problem(errors));
+    }
+
+    /// <summary>
+    /// Update User Profile Info
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPut("{id}/profile")]
+    public async Task<IActionResult> UpdateProfile(Guid id, UpdateUserProfileRequest request)
+    {
+        if (id != request.Id)
+        {
+            List<Error> errors = new();
+            errors.Add(Error.Validation("UserId", "Url Id is not equal than Request Id."));
+            return Problem(errors);
+        }
+
+        var command = _mapper.Map<UpdateProfileCommand>((request));
 
         var updateUserResult = await _mediator.Send(command);
 

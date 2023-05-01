@@ -9,8 +9,9 @@ public interface IUserService
 {
     Task<PaginatedResult<UserResponse>> GetAllUsers(int pageSize = 10, int pageNumber = 1);
     Task<UserResponse> GetById(Guid Id);
-    Task<UserResponse> Create(CreateUserDto customer);
-    Task<UserResponse> Update(UpdateUserDto customer);
+    Task<UserResponse> Create(CreateUserDto user);
+    Task<UserResponse> Update(UpdateUserDto user);
+    Task<UserResponse> UpdateProfile(UpdateUserProfileDto user);
     Task<UserResponse> Delete(Guid Id);
 }
 

@@ -108,6 +108,8 @@
                 {
                     _navigationManager.NavigateTo("/dashboard", forceLoad: true);
                 }
+                Snackbar.Add("No puedes iniciar sesi&oacuten, intenta nuevamente.", MudBlazor.Severity.Warning);
+                _processing = false;
             }
             catch (Exception ex)
             {

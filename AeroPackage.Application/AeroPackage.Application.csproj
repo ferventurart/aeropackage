@@ -50,6 +50,7 @@
     <None Remove="Packages\Commands\UpdatePackageStatus\" />
     <None Remove="Packages\Commands\UpdatePackage\" />
     <None Remove="Packages\Commands\DeleteAttachment\" />
+    <None Remove="Users\Commands\UpdateProfile\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Customers\" />
@@ -83,5 +84,6 @@
     <Folder Include="Packages\Commands\UpdatePackageStatus\" />
     <Folder Include="Packages\Commands\UpdatePackage\" />
     <Folder Include="Packages\Commands\DeleteAttachment\" />
+    <Folder Include="Users\Commands\UpdateProfile\" />
   </ItemGroup>
 </Project>

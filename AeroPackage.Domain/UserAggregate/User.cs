@@ -8,11 +8,11 @@ namespace AeroPackage.Domain.UserAggregate;
 
 public sealed class User : AggregateRoot<UserId, Guid>
 {
-    public string FirstName { get; }
-    public string LastName { get; }
-    public string Email { get; }
-    public string Password { get; } // TODO: Hash this
-    public UserRole Role { get; }
+    public string FirstName { get; private set; }
+    public string LastName { get; private set; }
+    public string Email { get; private set; }
+    public string Password { get; private set; } // TODO: Hash this
+    public UserRole Role { get; private set; }
     public UserStatus Status { get;}
     public DateTime CreatedDateTime { get; private set; }
     public DateTime? UpdatedDateTime { get; private set; }
