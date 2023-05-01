@@ -1,11 +1,11 @@
 ﻿<MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Primary" Class="pa-4">
     <MudDivider Class="mb-2" />
-    <MudNavLink Href="dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Tablero de Control</MudNavLink>
-    <MudNavLink Href="clientes" Match="NavLinkMatch.Prefix" Icon="fas fa-user-tag">Clientes</MudNavLink>
-    <MudNavGroup Title="Paquetes" Icon="fa-solid fa-box-open">
-        <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Search" Href="paquetes/buscar">Buscar</MudNavLink>
-        <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.DocumentScanner" Href="paquetes/registrar">Registrar</MudNavLink>
-        <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Grid4x4" Href="paquetes/kanban">Kanban</MudNavLink>
+    <MudNavLink Href="dashboard" Match="NavLinkMatch.All" Icon="@AeroPackageIconsExtension.Icons.DashboardIcon">Tablero de Control</MudNavLink>
+    <MudNavLink Href="clientes" Match="NavLinkMatch.Prefix" Icon="@AeroPackageIconsExtension.Icons.CustomersIcon">Clientes</MudNavLink>
+    <MudNavGroup Title="Paquetes" Icon="@AeroPackageIconsExtension.Icons.PackagesIcon">
+        <MudNavLink Match="NavLinkMatch.All" Icon="@AeroPackageIconsExtension.Icons.SearchPackagesIcon" Href="paquetes/buscar">Buscar</MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All" Icon="@AeroPackageIconsExtension.Icons.PackagesRegister" Href="paquetes/registrar">Registrar</MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All" Icon="@AeroPackageIconsExtension.Icons.KanbanPackages" Href="paquetes/kanban">Kanban</MudNavLink>
     </MudNavGroup>
-    <MudNavLink Href="usuarios" Match="NavLinkMatch.Prefix" Icon="fas fa-user-lock">Usuarios</MudNavLink>
+    <MudNavLink Href="usuarios" Match="NavLinkMatch.Prefix" Icon="@AeroPackageIconsExtension.Icons.UserLock">Usuarios</MudNavLink>
 </MudNavMenu>

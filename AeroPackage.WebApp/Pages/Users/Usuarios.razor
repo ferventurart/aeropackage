@@ -40,7 +40,7 @@
                 <HeaderContent>
                     <MudTh><MudTableSortLabel SortLabel="full_name" T="UserResponse">Nombre</MudTableSortLabel></MudTh>
                     <MudTh>Email</MudTh>
-                    <MudTh>Rol</MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="role" T="UserResponse">Rol</MudTableSortLabel></MudTh>
                     <MudTh>Estado</MudTh>
                     <MudTh>Opciones</MudTh>
                 </HeaderContent>
@@ -157,6 +157,9 @@
             {
                 case "full_name":
                     data = data.OrderByDirection(state.SortDirection, o => $"{o.FirstName.ToLowerInvariant()} {o.LastName.ToLowerInvariant()}");
+                    break;
+                case "role":
+                    data = data.OrderByDirection(state.SortDirection, o => o.Role);
                     break;
             }
 

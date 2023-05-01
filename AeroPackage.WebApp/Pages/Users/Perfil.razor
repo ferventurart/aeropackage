@@ -22,7 +22,7 @@
                                 </CardHeaderContent>
                             </MudCardHeader>
                             <MudCardContent Class="d-flex justify-content-center">
-                                <MudImage Class="d-block" Style="margin: 0 auto;" Width="200" Height="200" Fluid="true" Src="img/user.png"></MudImage>
+                                <MudImage Class="d-block" Style="margin: 0 auto;" Width="200" Height="200" Fluid="true" Src="img/user.svg"></MudImage>
                             </MudCardContent>
                             <MudCardActions Class="d-flex align-center flex-grow-1 gap-4 pa-4">
                                 <MudButton Variant="Variant.Filled" Color="Color.Info" Class="d-flex flex-1">Cambiar</MudButton>
@@ -99,7 +99,7 @@
 @code {
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-{
+    {
         new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
         new BreadcrumbItem("Mi Perfil", href:null, disabled: true),
     };
@@ -110,6 +110,8 @@
     MudForm form;
     UpdateUserProfileDtoValidator updateUserValidator = new UpdateUserProfileDtoValidator();
     UpdateUserProfileDto model = new UpdateUserProfileDto();
+
+
 
     protected override async Task OnInitializedAsync()
     {

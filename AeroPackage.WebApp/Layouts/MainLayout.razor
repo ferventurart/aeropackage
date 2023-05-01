@@ -16,7 +16,7 @@
                 <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" Link="https://mudblazor.com/" Target="_blank" />
                 <MudMenu FullWidth="true" Size="Size.Medium" AnchorOrigin="Origin.BottomRight" Dense="true">
                     <ActivatorContent>
-                        <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">@context.User.Identity.Name</MudChip>
+                        <MudChip Icon="@AeroPackageIconsExtension.Icons.UserIcon" Color="Color.Primary">@context.User.Identity.Name</MudChip>
                     </ActivatorContent>
                     <ChildContent>
                         <MudMenuItem Href="usuarios/mi-perfil" Icon="fa-solid fa-id-badge">Perfil</MudMenuItem>
@@ -58,4 +58,6 @@
     {
         DialogService.Show<DialogLogout>("Cerrar Sesi\u00f3n");
     }
+
+ 
 }
