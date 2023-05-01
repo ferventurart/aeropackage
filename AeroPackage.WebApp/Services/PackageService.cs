@@ -54,8 +54,17 @@ public class PackageService : IPackageService
             content.Add(new StringContent(package.UserId.ToString()), "UserId");
             content.Add(new StringContent(package.CustomerId.ToString()), "CustomerId");
             content.Add(new StringContent(package.Store), "Store");
-            content.Add(new StringContent(package.Courier), "Courier");
-            content.Add(new StringContent(package.CourierTrackingNumber), "CourierTrackingNumber");
+
+            if(!string.IsNullOrEmpty(package.Courier))
+            {
+                content.Add(new StringContent(package.Courier), "Courier");
+            }
+
+            if (!string.IsNullOrEmpty(package.CourierTrackingNumber))
+            {
+                content.Add(new StringContent(package.CourierTrackingNumber), "CourierTrackingNumber");
+            }
+
             content.Add(new StringContent(package.Weight.ToString()), "Weight");
             content.Add(new StringContent(package.QuantityArticles.ToString()), "QuantityArticles");
             content.Add(new StringContent(package.Description), "Description");
@@ -205,8 +214,15 @@ public class PackageService : IPackageService
             content.Add(new StringContent(package.UserId.ToString()), "UserId");
             content.Add(new StringContent(package.CustomerId.ToString()), "CustomerId");
             content.Add(new StringContent(package.Store), "Store");
-            content.Add(new StringContent(package.Courier), "Courier");
-            content.Add(new StringContent(package.CourierTrackingNumber), "CourierTrackingNumber");
+            if (!string.IsNullOrEmpty(package.Courier))
+            {
+                content.Add(new StringContent(package.Courier), "Courier");
+            }
+
+            if (!string.IsNullOrEmpty(package.CourierTrackingNumber))
+            {
+                content.Add(new StringContent(package.CourierTrackingNumber), "CourierTrackingNumber");
+            }
             content.Add(new StringContent(package.Weight.ToString()), "Weight");
             content.Add(new StringContent(package.QuantityArticles.ToString()), "QuantityArticles");
             content.Add(new StringContent(package.Description), "Description");

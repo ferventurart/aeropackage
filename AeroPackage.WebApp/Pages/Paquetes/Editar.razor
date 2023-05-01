@@ -200,19 +200,23 @@
                                             <MudListItem Icon="@Icons.Material.Filled.AttachFile" @key="@file">
                                                 @if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".gif" || extension == ".bmp")
                                                 {
-                                                    <MudChip Icon="@Icons.Material.Filled.Image"
-                                                             Color="Color.Primary"
-                                                             OnClose="@(() => RemoveFileFromList(file))" CloseIcon="@Icons.Material.Filled.Delete">
-                                                        @file.Name&nbsp;<code>@file.Size bytes</code>
-                                                    </MudChip>
+                                                    <MudTooltip Text="@file.Name" Arrow="true" Placement="Placement.Top">
+                                                        <MudChip Icon="@Icons.Material.Filled.Image"
+                                                                 Color="Color.Primary"
+                                                                 OnClose="@(() => RemoveFileFromList(file))" CloseIcon="@Icons.Material.Filled.Delete">
+                                                            Imagen&nbsp;<code>@file.Size bytes</code>
+                                                        </MudChip>
+                                                    </MudTooltip>
                                                 }
                                                 else
                                                 {
-                                                    <MudChip Icon="@Icons.Custom.FileFormats.FilePdf"
-                                                             Color="Color.Error"
-                                                             OnClose="@(() => RemoveFileFromList(file))" CloseIcon="@Icons.Material.Filled.Delete">
-                                                        @file.Name&nbsp;<code>@file.Size bytes</code>
-                                                    </MudChip>
+                                                    <MudTooltip Text="@file.Name" Arrow="true" Placement="Placement.Top">
+                                                        <MudChip Icon="@Icons.Custom.FileFormats.FilePdf"
+                                                                 Color="Color.Error"
+                                                                 OnClose="@(() => RemoveFileFromList(file))" CloseIcon="@Icons.Material.Filled.Delete">
+                                                            PDF&nbsp;<code>@file.Size bytes</code>
+                                                        </MudChip>
+                                                    </MudTooltip>
                                                 }
                                             </MudListItem>
                                         }
