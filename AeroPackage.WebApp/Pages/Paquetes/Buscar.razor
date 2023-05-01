@@ -79,10 +79,10 @@
                                   AdornmentIcon="@Icons.Material.Filled.Search" Clearable="true" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 </ToolBarContent>
                 <HeaderContent>
-                    <MudTh>AeroShopTrack</MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="owntrack" T="PackageResponse">AeroShopTrack</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="consignee" T="PackageResponse">Consignatario</MudTableSortLabel></MudTh>
                     <MudTh>Tienda</MudTh>
-                    <MudTh>Descripcion</MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="description" T="PackageResponse">Descripcion</MudTableSortLabel></MudTh>
                     <MudTh>Peso (Lbs)</MudTh>
                     <MudTh>Monto Compra</MudTh>
                     <MudTh>Opciones</MudTh>
@@ -156,13 +156,23 @@
                         return true;
                     if (element.Consignee.ToLower().Contains(_searchCriteria.ToLower()))
                         return true;
+                    if (element.OwnTrackingNumber.ToLower().Contains(_searchCriteria.ToLower()))
+                        return true;
+                    if (element.Description.ToLower().Contains(_searchCriteria.ToLower()))
+                        return true;
                     return false;
                 }).ToArray();
 
                 switch (state.SortLabel)
                 {
-                    case "full_name":
+                    case "consignee":
                         data = data.OrderByDirection(state.SortDirection, o => o.Consignee.ToLowerInvariant());
+                        break;
+                    case "owntrack":
+                        data = data.OrderByDirection(state.SortDirection, o => o.OwnTrackingNumber.ToLowerInvariant());
+                        break;
+                    case "description":
+                        data = data.OrderByDirection(state.SortDirection, o => o.Description.ToLowerInvariant());
                         break;
                 }
 
