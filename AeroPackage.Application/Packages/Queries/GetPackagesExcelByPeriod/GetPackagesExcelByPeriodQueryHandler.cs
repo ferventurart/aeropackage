@@ -27,7 +27,7 @@ public class GetPackagesExcelByPeriodQueryHandler : IRequestHandler<GetPackagesE
            PackageStatus.FromName(query.status), query.pageSize, query.pageNumber);
 
 
-        byte[] excelFile = await _excelService.GenerateExcelFile("Prueba");
+        byte[] excelFile = await _excelService.GenerateExcelPackagesByPeriodAndStatus("Prueba", packages.Results);
 
         return excelFile;
     }
