@@ -16,6 +16,11 @@ using AeroPackage.WebApp.Providers.Interfaces;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Net.Http;
+using Microsoft.JSInterop;
+using AeroPackage.WebApp.Model.Common;
+using System.Security.Cryptography;
+using System.Net.Mime;
+using System.Reflection.Metadata;
 
 namespace AeroPackage.WebApp.Services;
 
@@ -23,13 +28,13 @@ public class PackageService : IPackageService
 {
     private readonly HttpClient _httpClient;
     private readonly AuthenticationStateProvider _authStateProvider;
-    private readonly IBrowserFileProvider _browserFileProvider;
+    private readonly IJSRuntime _jsRuntime;
 
-    public PackageService(HttpClient httpClient, AuthenticationStateProvider authStateProvider, IBrowserFileProvider browserFileProvider)
+    public PackageService(HttpClient httpClient, AuthenticationStateProvider authStateProvider, IJSRuntime jsRuntime)
     {
         _httpClient = httpClient;
         _authStateProvider = authStateProvider;
-        _browserFileProvider = browserFileProvider;
+        _jsRuntime = jsRuntime;
     }
 
     public async Task<PackageResponse> Create(CreatePackageDto package)
@@ -55,7 +60,7 @@ public class PackageService : IPackageService
             content.Add(new StringContent(package.CustomerId.ToString()), "CustomerId");
             content.Add(new StringContent(package.Store), "Store");
 
-            if(!string.IsNullOrEmpty(package.Courier))
+            if (!string.IsNullOrEmpty(package.Courier))
             {
                 content.Add(new StringContent(package.Courier), "Courier");
             }
@@ -112,7 +117,7 @@ public class PackageService : IPackageService
         var content = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
-           throw new ApplicationException($"Reason: {response.ReasonPhrase}, Message: {content}");
+            throw new ApplicationException($"Reason: {response.ReasonPhrase}, Message: {content}");
 
         var packageResponse = JsonSerializer.Deserialize<PackageResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -189,6 +194,7 @@ public class PackageService : IPackageService
 
         return packages;
     }
+
 
     public async Task<PackageResponse> Update(UpdatePackageDto package)
     {

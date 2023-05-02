@@ -7,6 +7,8 @@
 @using AeroPackage.WebApp.Components.Package;
 @inject IPackageService _packageService
 @inject IDialogService DialogService
+@inject HttpClient httpClient;
+@inject IJSRuntime jsRuntime
 @attribute [Authorize(Roles = "Admin,Executive,Warehouse")]
 
 <AuthorizeView>
@@ -33,12 +35,21 @@
                             </MudDateRangePicker>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <SelectCommonPackageStatus StatusSelected="StatusSelectedCallback"/>
+                            <SelectCommonPackageStatus StatusSelected="StatusSelectedCallback" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MultiSelectCommonStores StoresSelected="StoresSelectedCallback" />
                         </MudItem>
-                        <MudItem xs="12">
+                        <MudItem xs="12" md="6">
+                            <MudButton OnClick="DownloadExcelFile"
+                                       Variant="Variant.Filled"
+                                       EndIcon="@Icons.Custom.FileFormats.FileExcel"
+                                       Color="Color.Success"
+                                       Size="Size.Small"
+                                       style="float: right;"
+                                       Disabled="@disabledFilterButton">Descargar Reporte</MudButton>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
                             <MudButton OnClick="OnFilterPackages"
                                        Variant="Variant.Filled"
                                        EndIcon="@Icons.Material.Filled.Search"
@@ -121,7 +132,7 @@
 
     [Inject] ISnackbar Snackbar { get; set; }
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {
+{
         new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
         new BreadcrumbItem("Paquetes", href: "/paquetes/buscar"),
         new BreadcrumbItem("Buscar", href: "/paquetes/buscar"),
@@ -136,13 +147,18 @@
     private string _packageStatus = "PreAlert";
     public string _packageStore { get; set; } = "Amazon,eBay,Shein,AliExpress";
     private bool disabledFilterButton = false;
+    public int _currentPage { get; set; } = 1;
+    public int _currenPageSize { get; set; } = 10;
 
     private async Task<TableData<PackageResponse>> ServerReload(TableState state)
     {
 
         try
         {
-            var paginatedResult = await _packageService.GetPackagesByPeriodStatusAndStore(_dateRange.Start.Value, _dateRange.End.Value, _packageStatus, _packageStore, state.PageSize, state.Page == 0 ? 1 : state.Page); ;
+            _currentPage = state.Page == 0 ? 1 : state.Page;
+            _currenPageSize = state.PageSize;
+
+            var paginatedResult = await _packageService.GetPackagesByPeriodStatusAndStore(_dateRange.Start.Value, _dateRange.End.Value, _packageStatus, _packageStore, state.PageSize, state.Page == 0 ? 1 : state.Page);
 
             if (paginatedResult.Results is not null)
             {
@@ -215,6 +231,31 @@
     private void StatusSelectedCallback(string status)
     {
         _packageStatus = status;
+    }
+
+    private async Task DownloadExcelFile()
+    {
+        try
+        {
+            var response = await httpClient
+                .GetAsync($"api/packages/reports/excel/by-period?from={_dateRange.Start.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}&to={_dateRange.End.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}&status={_packageStatus}&pageSize={_currenPageSize}&pageNumber={_currentPage}");
+            if (response.IsSuccessStatusCode)
+            {
+                var fileStream = response.Content.ReadAsStream();
+                using var streamRef = new DotNetStreamReference(stream: fileStream);
+                var fileName = $"Pckg_{_packageStatus}_{_dateRange.Start.Value.ToString("dd_MM_yyyy")}_{_dateRange.End.Value.ToString("dd_MM_yyyy")}.xlsx";
+                await jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+            }
+            else
+            {
+                Snackbar.Add("Ocurrio un error al llenar la informacion del reporte.", MudBlazor.Severity.Warning);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error intentando generar el excel.", MudBlazor.Severity.Error);
+        }
     }
 
 }

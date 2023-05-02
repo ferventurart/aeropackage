@@ -23,6 +23,8 @@ using AeroPackage.Contracts.Customer;
 using AeroPackage.Application.Packages.Commands.UpdatePackage;
 using AeroPackage.Application.Packages.Commands.DeleteAttachment;
 using AeroPackage.Application.Packages.Queries.GetPackagesExcelByPeriod;
+using System.IO;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace AeroPackage.Api.Controllers;
 
@@ -85,12 +87,11 @@ public class PackagesController : ApiController
             return NoContent();
         }
 
-        var file = new FileContentResult(getExcelResult.Value, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        {
-            FileDownloadName = $"PackagesReportByPeriod_{from.ToString("dd_MM_yyyy")}_{to.ToString("dd_MM_yyyy")}.xlsx"
-        };
+        var stream = new MemoryStream(getExcelResult.Value);
 
-        return file;
+        var fileName = $"{ from.ToString("dd_MM_yyyy") }_{ to.ToString("dd_MM_yyyy")}.xlsx";
+      
+        return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
     /// <summary>
