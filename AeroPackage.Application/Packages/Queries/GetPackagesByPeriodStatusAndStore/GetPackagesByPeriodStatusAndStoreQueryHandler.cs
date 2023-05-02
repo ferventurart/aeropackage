@@ -14,7 +14,7 @@ public class GetPackagesByPeriodStatusAndStoreQueryHandler : IRequestHandler<Get
     private readonly IPackageRepository _packageRepository;
 
     public GetPackagesByPeriodStatusAndStoreQueryHandler(IPackageRepository packageRepository)
-    {
+    { 
         _packageRepository = packageRepository;
     }
 
