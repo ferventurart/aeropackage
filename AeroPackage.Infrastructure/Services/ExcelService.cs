@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Runtime.InteropServices.JavaScript;
 using AeroPackage.Application.Common.Interfaces.Services;
 using AeroPackage.Domain.PackageAggregate;
-using AeroPackage.Infrastructure.Model;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Table;
