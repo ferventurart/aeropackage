@@ -14,6 +14,8 @@ public interface IPackageRepository
 
     Task<PaginatedResult<Package>> GetPackagesByPeriod(DateTime from, DateTime to, PackageStatus status, List<string> stores, int pageSize, int pageNumber);
 
+    Task<PaginatedResult<Package>> GetPackagesByPeriod(DateTime from, DateTime to, PackageStatus status, int pageSize, int pageNumber);
+
     Task<List<Package>> GetPackagesByPeriodAndStore(DateTime from, DateTime to, List<string> stores);
 
     Task<PaginatedResult<Package>> GetPackagesOfCustomer(CustomerId customerId, DateTime from, DateTime to, int pageSize, int pageNumber);

@@ -22,6 +22,7 @@ using AeroPackage.Application.Customers.Commands.UpdateCustomer;
 using AeroPackage.Contracts.Customer;
 using AeroPackage.Application.Packages.Commands.UpdatePackage;
 using AeroPackage.Application.Packages.Commands.DeleteAttachment;
+using AeroPackage.Application.Packages.Queries.GetPackagesExcelByPeriod;
 
 namespace AeroPackage.Api.Controllers;
 
@@ -60,6 +61,36 @@ public class PackagesController : ApiController
         return getPackageResult.Match(
             packages => Ok(_mapper.Map<PaginatedResult<PackageResponse>>(packages)),
             errors => Problem(errors));
+    }
+
+    /// <summary>
+    /// Get all Packages
+    /// </summary>
+    /// <param name="pageSize"></param>
+    /// <param name="pageNumber"></param>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <param name="stores"></param>
+    /// <param name="status"></param>
+    /// <returns></returns>
+    [HttpGet("reports/excel/by-period")]
+    public async Task<IActionResult> GetExcel(DateTime from, DateTime to, string status, int pageSize = 10, int pageNumber = 1)
+    {
+        var query = new GetPackagesExcelByPeriodQuery(from, to, status, pageSize, pageNumber);
+
+        var getExcelResult = await _mediator.Send(query);
+
+        if (getExcelResult.IsError)
+        {
+            return NoContent();
+        }
+
+        var file = new FileContentResult(getExcelResult.Value, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        {
+            FileDownloadName = $"PackagesReportByPeriod_{from.ToString("dd_MM_yyyy")}_{to.ToString("dd_MM_yyyy")}.xlsx"
+        };
+
+        return file;
     }
 
     /// <summary>
@@ -269,7 +300,7 @@ public class PackagesController : ApiController
 
         var deleteAttachmentResult = await _mediator.Send(command);
 
-        if(!deleteAttachmentResult.IsError)
+        if (!deleteAttachmentResult.IsError)
         {
             _fileHandler.DeleteFile(request.FileName, request.OwnTrackingNumber);
         }

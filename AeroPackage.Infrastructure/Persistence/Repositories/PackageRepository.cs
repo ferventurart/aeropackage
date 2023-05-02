@@ -73,6 +73,12 @@ public class PackageRepository : IPackageRepository
                 .Where(w => w.CreatedDateTime >= from && w.CreatedDateTime <= to && w.Status == status && stores.Contains(w.Store))
                 .ToPaginatedListAsync(pageNumber, pageSize);
 
+    public async Task<PaginatedResult<Package>> GetPackagesByPeriod(DateTime from, DateTime to, PackageStatus status, int pageSize, int pageNumber) =>
+        await _dbContext.Packages
+                .AsTracking()
+                .Where(w => w.CreatedDateTime >= from && w.CreatedDateTime <= to && w.Status == status)
+                .ToPaginatedListAsync(pageNumber, pageSize);
+
     public async Task<List<Package>> GetPackagesByPeriodAndStore(DateTime from, DateTime to, List<string> stores) =>
         await _dbContext.Packages
                 .AsTracking()

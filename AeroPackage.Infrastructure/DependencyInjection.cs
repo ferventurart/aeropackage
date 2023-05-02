@@ -10,11 +10,14 @@ using AeroPackage.Infrastructure.Services;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OfficeOpenXml;
 
 namespace AeroPackage.Infrastructure;
 
@@ -30,6 +33,16 @@ public static class DependencyInjection
 
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton<ICourierProvider, CourierProvider>();
+        services.AddSingleton<IExcelService, ExcelService>();
+
+        services.AddResponseCompression(options =>
+        {
+            options.Providers.Add<GzipCompressionProvider>();
+            options.EnableForHttps = true;
+        });
+
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
         return services;
     }
 

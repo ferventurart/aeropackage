@@ -24,7 +24,12 @@ var app = builder.Build();
         app.UseSwaggerUI();
     }
 
+    app.UseResponseCompression();
+
     app.UseAuthentication();
+
+    app.UseAuthorization();
+
     app.UseRouting();
 
     app.UseStaticFiles(new StaticFileOptions()

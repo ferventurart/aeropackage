@@ -51,6 +51,7 @@
     <None Remove="Packages\Commands\UpdatePackage\" />
     <None Remove="Packages\Commands\DeleteAttachment\" />
     <None Remove="Users\Commands\UpdateProfile\" />
+    <None Remove="Packages\Queries\GetPackagesExcelByPeriod\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Customers\" />
@@ -85,5 +86,6 @@
     <Folder Include="Packages\Commands\UpdatePackage\" />
     <Folder Include="Packages\Commands\DeleteAttachment\" />
     <Folder Include="Users\Commands\UpdateProfile\" />
+    <Folder Include="Packages\Queries\GetPackagesExcelByPeriod\" />
   </ItemGroup>
 </Project>
