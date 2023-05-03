@@ -6,4 +6,4 @@ using MediatR;
 
 namespace AeroPackage.Application.Packages.Queries.GetPackagesByPeriodStatusAndStore;
 
-public record GetPackagesByPeriodStatusAndStoreQuery(DateTime from, DateTime to, string status, string stores, int pageSize, int pageNumber) : IRequest<ErrorOr<PaginatedResult<Package>>>;
+public record GetPackagesByPeriodStatusAndStoreQuery(DateTime From, DateTime To, string Status, string Stores, int PageSize, int PageNumber) : IRequest<ErrorOr<PaginatedResult<Package>>>;

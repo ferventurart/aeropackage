@@ -11,8 +11,6 @@ using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using static AeroPackage.Domain.Common.DomainErrors.Errors;
-using static System.Collections.Specialized.BitVector32;
 
 namespace AeroPackage.Domain.PackageAggregate;
 
@@ -32,8 +30,9 @@ public sealed class Package : AggregateRoot<PackageId, int>
     public int QuantityArticles { get; private set; }
     public string Description { get; private set; }
     public decimal DeclaredValue { get; private set; }
-    public decimal? TaxValue { get; private set; }
+    public decimal TaxValue { get; private set; }
     public PackageStatus Status { get; private set; }
+    public bool Paid { get; private set; }
 
     public IReadOnlyList<string> Attachments => _attachments.AsReadOnly();
     public IReadOnlyList<PackageHistory> PackageHistories => _packageHistories.AsReadOnly();
@@ -55,7 +54,7 @@ public sealed class Package : AggregateRoot<PackageId, int>
         int quantityArticles,
         string description,
         decimal declaredValue,
-        decimal? taxValue,
+        decimal taxValue,
         PackageStatus status,
         List<PackageHistory> packageHistories) : base(packageId)
     {

@@ -25,13 +25,13 @@ public class GetPackagesByPeriodAndStoreQueryHandler : IRequestHandler<GetPackag
 
         List<string> stores = new List<string>();
 
-        foreach (string elemento in query.stores.Split(','))
+        foreach (string elemento in query.Stores.Split(','))
         {
             stores.Add(elemento.Trim());
         }
 
         var packages = await _packageRepository
-            .GetPackagesByPeriodAndStore(query.from, query.to, stores);
+            .GetPackagesByPeriodAndStore(query.From, query.To, stores);
 
         var response = packages.Select(s => new DragPackageResponse(s.OwnTrackingNumber.Value, s.Description, s.QuantityArticles, s.Store, s.Status.Name)).ToList();
 

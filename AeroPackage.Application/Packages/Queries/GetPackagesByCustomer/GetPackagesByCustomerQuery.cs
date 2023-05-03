@@ -6,4 +6,4 @@ using MediatR;
 
 namespace AeroPackage.Application.Packages.Queries.GetPackagesByCustomer;
 
-public record GetPackageByCustomerQuery(Guid Id, DateTime from, DateTime to, int pageSize, int pageNumber) : IRequest<ErrorOr<PaginatedResult<Package>>>;
+public record GetPackageByCustomerQuery(Guid Id, DateTime From, DateTime To, int PageSize, int PageNumber) : IRequest<ErrorOr<PaginatedResult<Package>>>;

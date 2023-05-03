@@ -55,7 +55,8 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
                 value => CustomerId.Create(value));
 
         builder.Property(d => d.Consignee)
-            .HasMaxLength(120);
+            .HasMaxLength(120)
+            .IsRequired(true);
 
         builder.Property(d => d.Store)
             .HasMaxLength(100);
@@ -80,10 +81,12 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
             .HasMaxLength(100);
 
         builder.Property(d => d.DeclaredValue)
-            .HasColumnType("decimal(10,2)");
+            .HasColumnType("decimal(10,2)")
+            .IsRequired(true);
 
         builder.Property(d => d.TaxValue)
-            .HasColumnType("decimal(10,2)");
+            .HasColumnType("decimal(10,2)")
+            .IsRequired(true);
 
         builder.Property(m => m.Status)
             .HasConversion(

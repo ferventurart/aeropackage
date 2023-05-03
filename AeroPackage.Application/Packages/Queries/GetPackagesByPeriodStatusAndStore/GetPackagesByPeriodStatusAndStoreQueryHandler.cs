@@ -24,14 +24,14 @@ public class GetPackagesByPeriodStatusAndStoreQueryHandler : IRequestHandler<Get
 
         List<string> stores = new List<string>();
 
-        foreach (string elemento in query.stores.Split(','))
+        foreach (string elemento in query.Stores.Split(','))
         {
             stores.Add(elemento.Trim());
         }
 
         var packages = await _packageRepository
-            .GetPackagesByPeriod(query.from, query.to,
-            PackageStatus.FromName(query.status), stores, query.pageSize, query.pageNumber);
+            .GetPackagesByPeriod(query.From, query.To,
+            PackageStatus.FromName(query.Status), stores, query.PageSize, query.PageNumber);
 
         return packages;
     }

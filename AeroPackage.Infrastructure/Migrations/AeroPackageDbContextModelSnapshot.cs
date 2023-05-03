@@ -125,6 +125,9 @@ namespace AeroPackage.Infrastructure.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
 
+                    b.Property<bool>("Paid")
+                        .HasColumnType("bit");
+
                     b.Property<int>("QuantityArticles")
                         .HasColumnType("int");
 
@@ -136,7 +139,7 @@ namespace AeroPackage.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal?>("TaxValue")
+                    b.Property<decimal>("TaxValue")
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTime?>("UpdatedDateTime")
@@ -156,6 +159,81 @@ namespace AeroPackage.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Packages", (string)null);
+                });
+
+            modelBuilder.Entity("AeroPackage.Domain.SaleAggregate.Sale", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("AmountDue")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Attachments")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Attachments");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateDue")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateIssued")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Deposit")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Reference")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("Tax")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Terms")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvoiceNumber")
+                        .IsUnique();
+
+                    b.ToTable("Sales", (string)null);
                 });
 
             modelBuilder.Entity("AeroPackage.Domain.UserAggregate.User", b =>
@@ -262,6 +340,48 @@ namespace AeroPackage.Infrastructure.Migrations
                         });
 
                     b.Navigation("PackageHistories");
+                });
+
+            modelBuilder.Entity("AeroPackage.Domain.SaleAggregate.Sale", b =>
+                {
+                    b.OwnsMany("AeroPackage.Domain.SaleAggregate.Entities.SaleItem", "Items", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("SaleItemId");
+
+                            b1.Property<int>("SaleId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Description")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<decimal>("LineTotal")
+                                .HasColumnType("decimal(10,2)");
+
+                            b1.Property<int?>("PackageId")
+                                .HasColumnType("int")
+                                .HasColumnName("PackageId");
+
+                            b1.Property<int>("Quantity")
+                                .HasColumnType("int");
+
+                            b1.Property<decimal>("Rate")
+                                .HasColumnType("decimal(10,2)");
+
+                            b1.HasKey("Id", "SaleId");
+
+                            b1.HasIndex("SaleId");
+
+                            b1.ToTable("SaleItems", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("SaleId");
+                        });
+
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

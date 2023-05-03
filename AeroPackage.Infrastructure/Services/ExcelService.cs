@@ -151,7 +151,7 @@ public class ExcelService : IExcelService
 
                     total += paquete.DeclaredValue;
                     articulos += paquete.QuantityArticles;
-                    impuesto += paquete.TaxValue ?? 0;
+                    impuesto += paquete.TaxValue;
 
                     i++;
                 }

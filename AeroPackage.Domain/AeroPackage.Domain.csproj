@@ -21,6 +21,10 @@
     <None Remove="UserAggregate\Enums\" />
     <None Remove="PackageAggregate\Constants\" />
     <None Remove="PackageAggregate\Entities\" />
+    <None Remove="SaleAggregate\" />
+    <None Remove="SaleAggregate\ValueObjects\" />
+    <None Remove="SaleAggregate\Entities\" />
+    <None Remove="SaleAggregate\Enums\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CustomerAggregate\" />
@@ -33,5 +37,9 @@
     <Folder Include="UserAggregate\Enums\" />
     <Folder Include="PackageAggregate\Constants\" />
     <Folder Include="PackageAggregate\Entities\" />
+    <Folder Include="SaleAggregate\" />
+    <Folder Include="SaleAggregate\ValueObjects\" />
+    <Folder Include="SaleAggregate\Entities\" />
+    <Folder Include="SaleAggregate\Enums\" />
   </ItemGroup>
 </Project>

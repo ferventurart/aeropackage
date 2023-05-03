@@ -23,8 +23,8 @@ public class GetPackageByCustomerQueryHandler : IRequestHandler<GetPackageByCust
 
         var packages = await _packageRepository.GetPackagesOfCustomer(
             CustomerId.Create(query.Id),
-            query.from,
-            query.to, query.pageSize, query.pageNumber);
+            query.From,
+            query.To, query.PageSize, query.PageNumber);
 
         return packages;
     }

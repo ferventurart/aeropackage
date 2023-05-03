@@ -7,4 +7,4 @@ using MediatR;
 
 namespace AeroPackage.Application.Packages.Queries.GetPackagesByPeriodAndStore;
 
-public record GetPackagesByPeriodAndStoreQuery(DateTime from, DateTime to, string stores) : IRequest<ErrorOr<List<DragPackageResponse>>>;
+public record GetPackagesByPeriodAndStoreQuery(DateTime From, DateTime To, string Stores) : IRequest<ErrorOr<List<DragPackageResponse>>>;
