@@ -1,0 +1,124 @@
+﻿@page "/servicios/crear"
+@using AeroPackage.Contracts.Service;
+@using AeroPackage.WebApp.Components.Service;
+@using System.Globalization;
+@using AeroPackage.WebApp.Model.Service;
+@using FluentValidation
+@inject NavigationManager _navigationManager
+@inject ICompanyServicesService _companyServicesService;
+@attribute [Authorize(Roles = "Admin,Executive")]
+
+<AuthorizeView>
+    <Authorized>
+        <MudContainer Fixed="true">
+            <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+            <MudCard Class="mt-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Informaci&oacute;n del Servicio</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Disabled="@_processing" Icon="@Icons.Material.Filled.ChevronLeft" Variant="Variant.Filled" Color="Color.Primary" Href="/servicios" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudForm Model="@model" @ref="@form" Validation="@(createServiceValidator.ValidateValue)" ValidationDelay="0">
+                    <MudCardContent>
+                        <MudTextField @bind-Value="model.Name"
+                                      For="@(() => model.Name)"
+                                      Immediate="true"
+                                      Label="Nombre" />
+
+                        <MudNumericField @bind-Value="model.Rate"
+                                         Label="Tarifa"
+                                         Min="1"
+                                         Class="mt-3"
+                                         Culture="@CultureInfo.GetCultureInfo("en-US")"
+                                         Variant="Variant.Text"
+                                         For="@(() => model.Rate)"
+                                         Immediate="false"
+                                         Adornment="Adornment.Start"
+                                         AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                                         AdornmentColor="Color.Success" />
+
+                    </MudCardContent>
+                </MudForm>
+                <MudCardActions>
+                    <MudCardActions Class="pa-4">
+                        <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Submit())">
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Guardando...</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Guardar</MudText>
+                            }
+                        </MudButton>
+                        &nbsp;&nbsp;
+                        <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.DeleteSweep" Variant="Variant.Filled" Color="Color.Warning" OnClick="@(()=>form.Reset())">
+                            <MudText>Limpiar</MudText>
+                        </MudButton>
+                    </MudCardActions>
+                </MudCardActions>
+            </MudCard>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+{
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Servicios", href: "/servicios"),
+        new BreadcrumbItem("Crear Servicios", href: "/servicios/crear"),
+    };
+
+    private bool _processing = false;
+    [Inject] ISnackbar Snackbar { get; set; }
+    MudForm form;
+    CreateServiceDtoValidator createServiceValidator = new CreateServiceDtoValidator();
+    CreateServiceDto model = new CreateServiceDto();
+
+    private async Task Submit()
+    {
+        try
+        {
+            _processing = true;
+
+            await form.Validate();
+
+            if (form.IsValid)
+            {
+                try
+                {
+                    var service = await _companyServicesService.Create(model);
+                    if (service is not null)
+                    {
+                        Snackbar.Add("Servicio registrado exitosamente.", MudBlazor.Severity.Success);
+                        _navigationManager.NavigateTo("/servicios", forceLoad: false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add("Ocurrio un error al registrar el servicio, intenta nuevamente.", MudBlazor.Severity.Error);
+                    _processing = false;
+                }
+            }
+            else
+            {
+                _processing = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error al procesar la informacion del formulario.", MudBlazor.Severity.Error);
+            _navigationManager.NavigateTo("/servicios", forceLoad: false);
+        }
+
+    }
+}
+

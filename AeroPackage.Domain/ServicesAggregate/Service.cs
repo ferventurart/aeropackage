@@ -18,9 +18,10 @@ public sealed class Service : AggregateRoot<ServiceId, Guid>
     public DateTime? UpdatedDateTime { get; private set; }
 
     private Service(
+        ServiceId serviceId,
         string name,
         decimal rate,
-        ServiceStatus status)
+        ServiceStatus status) : base(serviceId)
     {
         Name = name;
         Rate = rate;
@@ -29,7 +30,7 @@ public sealed class Service : AggregateRoot<ServiceId, Guid>
 
     public static Service Create(string name, decimal rate)
     {
-        return new Service(name, rate, ServiceStatus.Active);
+        return new Service(ServiceId.CreateUnique(), name, rate, ServiceStatus.Active);
     }
 
     public void UpdateProperty<T>(Expression<Func<Service, T>> propertyExpression, T newValue)

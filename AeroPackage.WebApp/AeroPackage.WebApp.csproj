@@ -58,6 +58,9 @@
 	  <Folder Include="Providers\Interfaces\" />
 	  <Folder Include="Pages\Sales\" />
 	  <Folder Include="Model\Sale\" />
+	  <Folder Include="Pages\Services\" />
+	  <Folder Include="Model\Service\" />
+	  <Folder Include="Components\Service\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Pages\Paquetes\" />
@@ -80,6 +83,9 @@
 	  <None Remove="Providers\Interfaces\" />
 	  <None Remove="Pages\Sales\" />
 	  <None Remove="Model\Sale\" />
+	  <None Remove="Pages\Services\" />
+	  <None Remove="Model\Service\" />
+	  <None Remove="Components\Service\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\AeroPackage.Contracts\AeroPackage.Contracts.csproj">

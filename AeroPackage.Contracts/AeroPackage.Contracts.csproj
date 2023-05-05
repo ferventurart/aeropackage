@@ -11,12 +11,14 @@
     <None Remove="Package\" />
     <None Remove="User\" />
     <None Remove="Sale\" />
+    <None Remove="Service\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Customer\" />
     <Folder Include="Package\" />
     <Folder Include="User\" />
     <Folder Include="Sale\" />
+    <Folder Include="Service\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />

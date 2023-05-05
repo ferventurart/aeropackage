@@ -1,0 +1,171 @@
+﻿@page "/servicios"
+@using AeroPackage.WebApp.Model
+@using AeroPackage.Contracts.Service;
+@using AeroPackage.WebApp.Components.Service;
+@using AeroPackage.WebApp.Providers;
+@inject ICompanyServicesService _companyServicesService
+@inject IDialogService DialogService
+@attribute [Authorize(Roles = "Admin,Executive")]
+
+<AuthorizeView>
+    <Authorized>
+        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+        <MudCard Class="mt-4">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Listado de Servicios</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton Href="/servicios/crear"
+                               Class="mt-2"
+                               Color="Color.Primary" Variant="Variant.Filled"
+                               Size="Size.Small"
+                               EndIcon="@Icons.Material.Filled.Add">Nuevo</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudTable @ref="@_table"
+                      Dense="true"
+                      Hover="true"
+                      Bordered="true"
+                      Striped="true"
+                      LoadingProgressColor="Color.Primary"
+                      ServerData="@(new Func<TableState, Task<TableData<ServiceResponse>>>(ServerReload))"
+                      @bind-SelectedItem="_selectedService"
+                      Breakpoint="Breakpoint.Sm"
+                      Class="mt-10">
+                <ToolBarContent>
+                    <MudTextField Style="width: fit-content" Margin="Margin.Dense" Variant="Variant.Outlined" T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Buscar" Den Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" Clearable="true" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="full_name" T="ServiceResponse">Nombre</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="rate" T="ServiceResponse">Tarifa</MudTableSortLabel></MudTh>
+                    <MudTh>Estado</MudTh>
+                    <MudTh>Opciones</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="service">
+                    <MudTd DataLabel="Nombre">@service.Name</MudTd>
+                    <MudTd DataLabel="Tarifa">@service.Rate.ToString("C2")</MudTd>
+                    <MudTd DataLabel="Estado">
+                        @if (service.Status == 1)
+                        {
+                            <MudChip Size="Size.Small" Color="Color.Success">Activo</MudChip>
+                        }
+                        else
+                        {
+                            <MudChip Size="Size.Small">Inactivo</MudChip>
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Opciones">
+                        <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">
+                            <MudIconButton Href="@($"/servicios/editar/{service.Id}")" Icon="@Icons.Material.Filled.Edit" Color="@Color.Surface" />
+                            <MudSpacer />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" OnClick="@(async () => await DeleteServiceAsync(service.Id))" />
+                        </MudButtonGroup>
+                    </MudTd>
+                </RowTemplate>
+                <LoadingContent>
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                </LoadingContent>
+                <NoRecordsContent>
+                    <MudAlert Class="pt-2 align-center" Icon="@Icons.Material.Filled.TableView" Severity="Severity.Normal">No hay registros para mostrar.</MudAlert>
+                </NoRecordsContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudCard>
+
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+
+    [Inject] ISnackbar Snackbar { get; set; }
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Tablero de Control", href: "/dashboard"),
+        new BreadcrumbItem("Servicios", href: "/servicios"),
+    };
+
+    private MudTable<ServiceResponse> _table;
+    private string _searchCriteria = string.Empty;
+    private ServiceResponse _selectedService = null;
+    private HashSet<ServiceResponse> _selectedItems = new HashSet<ServiceResponse>();
+    private PaginatedResult<ServiceResponse> _services = new();
+
+    private async Task DeleteServiceAsync(string Id)
+    {
+        try
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("Id", Guid.Parse(Id));
+
+            var dialog = await DialogService.ShowAsync<DialogDelete>("Borrar Servicio", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                _table.ReloadServerData();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error intentando eliminar el dato.", MudBlazor.Severity.Error);
+        }
+
+    }
+
+    private async Task<TableData<ServiceResponse>> ServerReload(TableState state)
+    {
+        try
+        {
+            var paginatedResult = await _companyServicesService.GetAllServices(state.PageSize, state.Page == 0 ? 1 : state.Page);
+            if (paginatedResult.Results is not null)
+            {
+                IEnumerable<ServiceResponse> data = paginatedResult.Results;
+
+                await Task.Delay(300);
+
+                data = data.Where(element =>
+                {
+                    if (string.IsNullOrWhiteSpace(_searchCriteria))
+                        return true;
+                    if (element.Name.ToLower().Contains(_searchCriteria.ToLower()))
+                        return true;
+                    return false;
+                }).ToArray();
+
+                switch (state.SortLabel)
+                {
+                    case "full_name":
+                        data = data.OrderByDirection(state.SortDirection, o => $"{o.Name.ToLowerInvariant()}");
+                        break;
+
+                    case "rate":
+                        data = data.OrderByDirection(state.SortDirection, o => o.Rate);
+                        break;
+                }
+
+                return new TableData<ServiceResponse>() { TotalItems = paginatedResult.TotalRecords, Items = data };
+            }
+
+            return new TableData<ServiceResponse>() { Items = null, TotalItems = 0 };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            Snackbar.Add("Ocurrio un error intentando recuperar la informacion.", MudBlazor.Severity.Error);
+            return new TableData<ServiceResponse>() { Items = null, TotalItems = 0 };
+        }
+    }
+
+    private void OnSearch(string text)
+    {
+        _searchCriteria = text;
+        _table.ReloadServerData();
+    }
+}
+
