@@ -30,7 +30,8 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
              .HasConversion(
                 id => id.Value,
                 value => SaleId.Create(value))
-             .ValueGeneratedNever();
+             .ValueGeneratedOnAdd()
+             .UseIdentityColumn();
 
         builder.Property(m => m.InvoiceNumber)
                .HasConversion(

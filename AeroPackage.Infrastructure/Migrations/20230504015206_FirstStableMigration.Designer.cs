@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AeroPackage.Infrastructure.Migrations
 {
     [DbContext(typeof(AeroPackageDbContext))]
-    [Migration("20230503114339_FirstStableMigration")]
+    [Migration("20230504015206_FirstStableMigration")]
     partial class FirstStableMigration
     {
         /// <inheritdoc />
@@ -85,7 +85,10 @@ namespace AeroPackage.Infrastructure.Migrations
             modelBuilder.Entity("AeroPackage.Domain.PackageAggregate.Package", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Attachments")
                         .HasColumnType("nvarchar(max)")
@@ -167,7 +170,10 @@ namespace AeroPackage.Infrastructure.Migrations
             modelBuilder.Entity("AeroPackage.Domain.SaleAggregate.Sale", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AmountDue")
                         .HasColumnType("decimal(10,2)");

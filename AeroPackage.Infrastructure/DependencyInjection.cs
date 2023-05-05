@@ -52,6 +52,7 @@ public static class DependencyInjection
         services.AddDbContext<AeroPackageDbContext>(options =>
           options.UseSqlServer(configuration.GetConnectionString("Database")));
 
+        services.AddScoped<ISaleRepository, SaleRepository>();
         services.AddScoped<IPackageRepository, PackageRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

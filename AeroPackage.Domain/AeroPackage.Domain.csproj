@@ -25,6 +25,9 @@
     <None Remove="SaleAggregate\ValueObjects\" />
     <None Remove="SaleAggregate\Entities\" />
     <None Remove="SaleAggregate\Enums\" />
+    <None Remove="ServicesAggregate\" />
+    <None Remove="ServicesAggregate\ValueObjects\" />
+    <None Remove="ServicesAggregate\Enums\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CustomerAggregate\" />
@@ -41,5 +44,8 @@
     <Folder Include="SaleAggregate\ValueObjects\" />
     <Folder Include="SaleAggregate\Entities\" />
     <Folder Include="SaleAggregate\Enums\" />
+    <Folder Include="ServicesAggregate\" />
+    <Folder Include="ServicesAggregate\ValueObjects\" />
+    <Folder Include="ServicesAggregate\Enums\" />
   </ItemGroup>
 </Project>

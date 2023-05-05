@@ -31,7 +31,8 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
              .HasConversion(
                 id => id.Value,
                 value => PackageId.Create(value))
-             .ValueGeneratedNever();
+             .ValueGeneratedOnAdd()
+             .UseIdentityColumn();
 
         builder.Property(m => m.OwnTrackingNumber)
                .HasConversion(

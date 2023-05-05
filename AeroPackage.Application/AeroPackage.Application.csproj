@@ -52,6 +52,19 @@
     <None Remove="Packages\Commands\DeleteAttachment\" />
     <None Remove="Users\Commands\UpdateProfile\" />
     <None Remove="Packages\Queries\GetPackagesExcelByPeriod\" />
+    <None Remove="Sales\" />
+    <None Remove="Sales\Commands\" />
+    <None Remove="Sales\Queries\" />
+    <None Remove="Sales\Commands\CreateInvoice\" />
+    <None Remove="Services\" />
+    <None Remove="Services\Commands\" />
+    <None Remove="Services\Queries\" />
+    <None Remove="Services\Commands\CreateService\" />
+    <None Remove="Services\Commands\DeleteService\" />
+    <None Remove="Services\Commands\UpdateService\" />
+    <None Remove="Services\Queries\GetServices\" />
+    <None Remove="Services\Queries\GetServiceById\" />
+    <None Remove="Services\Queries\GetServicesActiveByName\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Customers\" />
@@ -87,5 +100,18 @@
     <Folder Include="Packages\Commands\DeleteAttachment\" />
     <Folder Include="Users\Commands\UpdateProfile\" />
     <Folder Include="Packages\Queries\GetPackagesExcelByPeriod\" />
+    <Folder Include="Sales\" />
+    <Folder Include="Sales\Commands\" />
+    <Folder Include="Sales\Queries\" />
+    <Folder Include="Sales\Commands\CreateInvoice\" />
+    <Folder Include="Services\" />
+    <Folder Include="Services\Commands\" />
+    <Folder Include="Services\Queries\" />
+    <Folder Include="Services\Commands\CreateService\" />
+    <Folder Include="Services\Commands\DeleteService\" />
+    <Folder Include="Services\Commands\UpdateService\" />
+    <Folder Include="Services\Queries\GetServices\" />
+    <Folder Include="Services\Queries\GetServiceById\" />
+    <Folder Include="Services\Queries\GetServicesActiveByName\" />
   </ItemGroup>
 </Project>

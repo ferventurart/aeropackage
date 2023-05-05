@@ -42,7 +42,6 @@ public sealed class Package : AggregateRoot<PackageId, int>
     public DateTime? UpdatedDateTime { get; private set; }
 
     private Package(
-        PackageId packageId,
         OwnTrackingNumber ownTrackingNumber,
         UserId userId,
         CustomerId customerId,
@@ -56,7 +55,7 @@ public sealed class Package : AggregateRoot<PackageId, int>
         decimal declaredValue,
         decimal taxValue,
         PackageStatus status,
-        List<PackageHistory> packageHistories) : base(packageId)
+        List<PackageHistory> packageHistories) : base()
     {
         OwnTrackingNumber = ownTrackingNumber;
         UserId = userId;
@@ -75,7 +74,6 @@ public sealed class Package : AggregateRoot<PackageId, int>
     }
 
     public static Package Create(
-        PackageId packageId,
         OwnTrackingNumber ownTrackingNumber,
         UserId userId,
         CustomerId customerId,
@@ -91,7 +89,6 @@ public sealed class Package : AggregateRoot<PackageId, int>
     {
         
         return new Package(
-            packageId,
             ownTrackingNumber,
             userId,
             customerId,

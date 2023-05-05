@@ -7,11 +7,13 @@ public class GetPackagesByPeriodStatusAndStoreQueryValidator : AbstractValidator
 {
 	public GetPackagesByPeriodStatusAndStoreQueryValidator()
 	{
-        RuleFor(r => r.from)
-            .LessThan(r => r.to);
+        RuleFor(r => r.From)
+			.NotEmpty()
+            .LessThan(r => r.To);
 
-        RuleFor(r => r.to)
-			.GreaterThan(r => r.from);
+        RuleFor(r => r.To)
+			.NotEmpty()
+			.GreaterThan(r => r.From);
 	}
 }
 

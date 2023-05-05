@@ -36,11 +36,12 @@ public class CreatePackageCommandHandler : IRequestHandler<CreatePackageCommand,
     {
         await Task.CompletedTask;
 
-        var lastInsertedId = await _packageRepository.GetLastInsertedId();
-
         var customerId = CustomerId.Create(command.CustomerId);
         var userId = UserId.Create(command.UserId);
-        var packageId = PackageId.Create(lastInsertedId);
+        var packageId = PackageId.Create(0);
+
+        var lastInsertedId = await _packageRepository.GetLastInsertedId();
+
         var ownTrackingNumber = OwnTrackingNumber.Create(lastInsertedId);
 
         if (_customerRepository.GetCustomerById(customerId) is not Customer customer)
@@ -59,7 +60,6 @@ public class CreatePackageCommandHandler : IRequestHandler<CreatePackageCommand,
         }
 
         var package = Package.Create(
-            packageId,
             ownTrackingNumber,
             userId,
             customerId,

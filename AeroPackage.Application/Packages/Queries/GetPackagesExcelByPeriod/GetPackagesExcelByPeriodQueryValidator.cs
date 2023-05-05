@@ -7,9 +7,13 @@ namespace AeroPackage.Application.Packages.Queries.GetPackagesExcelByPeriod
 	{
 		public GetPackagesExcelByPeriodQueryValidator()
 		{
-			RuleFor(r => r.From).NotEmpty();
+            RuleFor(r => r.From)
+                .NotEmpty()
+                .LessThan(r => r.To);
 
-            RuleFor(r => r.To).NotEmpty();
+            RuleFor(r => r.To)
+                .NotEmpty()
+                .GreaterThan(r => r.From);
 
             RuleFor(r => r.Status).NotEmpty();
         }

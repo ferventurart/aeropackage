@@ -11,5 +11,7 @@ public class SaleStatus : SmartEnum<SaleStatus>
     }
     public static readonly SaleStatus Pending = new(nameof(Pending), 1);
     public static readonly PackageStatus Paid = new(nameof(Paid), 2);
+    public static readonly PackageStatus Cancelled = new(nameof(Cancelled), 3);
+    public static readonly PackageStatus Refunded = new(nameof(Refunded), 4);
 }
 
