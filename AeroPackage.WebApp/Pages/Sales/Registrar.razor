@@ -10,12 +10,11 @@
 @page "/ventas/registrar"
 <AuthorizeView>
     <Authorized>
-        <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
-        <MudGrid Spacing="10">
-            <MudItem xs="8" sm="8">
+        <MudGrid Spacing="2">
+            <MudItem sm="7" md="7" lg="7">
                 <MudPaper Class="d-flex flex-column pa-4" Elevation="3">
-                    <MudGrid>
-                        <MudItem xs="10">
+                    <MudGrid Spacing="2" Justify="Justify.SpaceEvenly">
+                        <MudItem xs="12">
                             <MudAutocomplete T="ServiceResponse"
                                              Label="Servicios"
                                              @bind-Value="_selectedService"
@@ -29,140 +28,86 @@
                                              Variant="Variant.Outlined"
                                              RequiredError="Seleccione un servicio del listado"
                                              Placeholder="Servicio a Facturar"
-                                             Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="2">
-                            <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddToList" Class="mt-1"></MudIconButton>
-                        </MudItem>
-                    </MudGrid>
-                </MudPaper>
-                <MudPaper Class="d-flex flex-column mt-3" Elevation="3" Square="false">
-                    <MudGrid>
-                        <MudItem xs="12">
-                            <MudTable Items="@model.Items" Dense="@dense" Hover="@hover" ReadOnly="@ronly" CanCancelEdit="@canCancelEdit"
-                                      @bind-SelectedItem="selectedItem1" SortLabel="Sort By" CommitEditTooltip="Guardar Cambio"
-                                      RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
-                                      IsEditRowSwitchingBlocked="true"
-                                      HeaderClass="mud-theme-primary">
-                                <HeaderContent>
-                                    <MudTh Style="color:white;">Item</MudTh>
-                                    <MudTh Style="color:white;">Precio</MudTh>
-                                    <MudTh Style="color:white;">Cant.</MudTh>
-                                    <MudTh Style="color:white;">Desc.</MudTh>
-                                    <MudTh Style="color:white;">Subtotal</MudTh>
-                                    <MudTh></MudTh>
-                                </HeaderContent>
-                                <RowTemplate Context="SaleDetail">
-                                    <MudTd DataLabel="Item">@SaleDetail.Description</MudTd>
-                                    <MudTd DataLabel="Precio">@SaleDetail.Rate.ToString("C2")</MudTd>
-                                    <MudTd DataLabel="Cant.">@SaleDetail.Quantity</MudTd>
-                                    <MudTd DataLabel="Cant.">@SaleDetail.Discount.ToString("C2")</MudTd>
-                                    <MudTd DataLabel="Subtotal">@SaleDetail.LineTotal.ToString("C2")</MudTd>
-                                    <MudTd DataLabel="Borrar"><MudIconButton OnClick="(() => RemoveFromList(SaleDetail))" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"></MudIconButton></MudTd>
-                                </RowTemplate>
-                                <RowEditingTemplate Context="SaleDetail">
-                                    <MudTd DataLabel="Item">@SaleDetail.Description</MudTd>
-                                    <MudTd DataLabel="Precio">@SaleDetail.Rate.ToString("C2")</MudTd>
-                                    <MudTd DataLabel="Cant.">
-                                        <MudNumericField HideSpinButtons="true" Margin="Margin.Dense" @bind-Value="@SaleDetail.Quantity" Required />
-                                    </MudTd>
-                                    <MudTd DataLabel="Desc.">
-                                        <MudNumericField HideSpinButtons="true" Max="@(SaleDetail.Quantity * SaleDetail.Rate)" Margin="Margin.Dense" @bind-Value="@SaleDetail.Discount" Required />
-                                    </MudTd>
-                                    <MudTd DataLabel="Subtotal">@SaleDetail.LineTotal.ToString("C2")</MudTd>
-                                    <MudTd DataLabel="Borrar"><MudIconButton OnClick="(() => RemoveFromList(SaleDetail))" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"></MudIconButton></MudTd>
-                                </RowEditingTemplate>
-                                <EditButtonContent Context="button">
-                                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
-                                </EditButtonContent>
-                            </MudTable>
+                                             Margin="Margin.Dense"
+                                             Clearable="true" />
+
                         </MudItem>
                     </MudGrid>
-                </MudPaper>
-                <MudPaper Class="d-flex flex-column pa-4 mt-3" Elevation="3" Square="false">
-                    <MudItem xs="12">
-                        <MudGrid>
-                            <MudItem xs="12">
-                                <MudAutocomplete T="CustomerResponse"
-                                                 Label="Cliente"
-                                                 @bind-Value="_selectedCustomer"
-                                                 SearchFunc="@SearchCustomerAsync"
-                                                 AdornmentIcon="@Icons.Material.Filled.Search"
-                                                 AdornmentColor="Color.Primary"
-                                                 ShowProgressIndicator="true"
-                                                 ProgressIndicatorColor="Color.Primary"
-                                                 ToStringFunc="@(customer => customer == null ? null : $"{customer.FirstName} {customer.LastName}")"
-                                                 Immediate="true"
-                                                 Required="true"
-                                                 Variant="Variant.Outlined"
-                                                 RequiredError="Seleccione un cliente del listado"
-                                                 Placeholder="Buscar cliente por nombre"
-                                                 Margin="Margin.Dense" />
+                    <MudGrid Spacing="2" Justify="Justify.SpaceEvenly" Class="mt-3" Style="height:100vh; overflow-y: scroll;">
+                        @foreach (var item in Services.Results)
+                        {
+                            <MudItem>
+                                <MudPaper Height="150px" Width="150px" Class="pa-4" Style="@($"color:{Colors.Grey.Darken2}; background:{Colors.Grey.Lighten5}; cursor: pointer;")"
+                                          @onclick="(() => AddToList(item))" Elevation="3">
+                                    <MudStack Spacing="3" Class="d-flex">
+                                        <MudText Align="Align.Left" Typo="Typo.caption" Style="@($"color:{Colors.BlueGrey.Lighten2};")">Servicio</MudText>
+                                        <MudText Align="Align.Left" Style="@($"color:{Colors.BlueGrey.Darken2};height: 49px;")" Typo="Typo.button"><b>@item.Name.Trim().Substring(0, (Convert.ToInt32(item.Name.Trim().Length * 0.78m)))</b></MudText>
+                                        <MudText Align="Align.Left" Style="@($"color:{Colors.LightBlue.Darken2};")"><b>@item.Rate.ToString("C2")</b></MudText>
+                                    </MudStack>
+                                </MudPaper>
                             </MudItem>
-                            <MudItem xs="6">
-                                <MudTextField @bind-Value="@model.Terms" Label="Terminos y Condiciones" Lines="3"></MudTextField>
-                            </MudItem>
-                            <MudItem xs="6">
-                                <MudTextField @bind-Value="@model.Notes" Label="Notas" Lines="3"></MudTextField>
-                            </MudItem>
-                            <MudItem xs="12" Class="d-flex justify-center">
-                                <div class="d-flex">
-                                    <MudSwitch @bind-Checked="@registerDeposit" Label="Registrar Deposito" Color="Color.Success" ThumbIcon="@Icons.Material.Filled.AttachMoney"></MudSwitch>
-                                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Pause" Color="Color.Warning" Class="ml-2">Pausar</MudButton>
-                                </div>
-                            </MudItem>
-                        </MudGrid>
-                    </MudItem>
+                        }
+                    </MudGrid>
+                    <div class="d-flex flex-column align-center mt-5">
+                        <MudPagination SelectedChanged="PageChanged" BoundaryCount="1" MiddleCount="1" Count="@((Services.TotalRecords + PageSize - 1) / PageSize)" />
+                    </div>
                 </MudPaper>
             </MudItem>
-            <MudItem xs="4" sm="4">
-                <MudPaper Class="d-flex flex-column" Style="height:100%;" Outlined="true">
-                    <MudList>
-                        <MudListItem>
-                            <div class="d-flex">
-                                <MudText>Subtotal</MudText>
-                                <MudText Inline="true" Class="ml-auto" Typo="Typo.h5">@model.Subtotal.ToString("C2")</MudText>
-                            </div>
-                        </MudListItem>
-                        <MudDivider />
-                        <MudListItem>
-                            <div class="d-flex">
-                                <MudText>Descuento</MudText>
-                                <MudText Inline="true" Class="ml-auto" Typo="Typo.h5">@model.Discount.ToString("C2")</MudText>
-                            </div>
-                        </MudListItem>
-                        <MudDivider />
-                        <MudListItem>
-                            <div class="d-flex">
-                                <MudText>Deposito</MudText>
-                                @if (!registerDeposit)
+            <MudItem xs="12" sm="5" md="5" lg="5">
+                <MudPaper Class="d-flex flex-column" Elevation="2">
+                    <MudSimpleTable Hover="true" Dense="true" Class="mud-table-sticky-footer" FixedHeader="true" Style="height:117vh;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Item</th>
+                                <th>Cant.</th>
+                                <th>Precio</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (model.Items.Count > 0)
+                            {
+                                @foreach (var item in model.Items)
                                 {
-
-                                    <MudText Inline="true" Class="ml-auto" Typo="Typo.h5">@model.Deposit.ToString("C2")</MudText>
-
+                                    <tr>
+                                        <td>
+                                            <MudIconButton Variant="Variant.Text"
+                                                           Size="Size.Small" Color="Color.Error"
+                                                           Icon="@Icons.Material.Filled.Delete"
+                                                           OnClick="(() => RemoveFromList(item))" />
+                                        </td>
+                                        <td>@item.Description</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.Rate.ToString("C2")</td>
+                                        <td>@item.LineTotal.ToString("C2")</td>
+                                    </tr>
                                 }
-                                else
-                                {
-                                    <MudNumericField Clearable="true"
-                                                     Adornment="Adornment.Start"
-                                                     AdornmentIcon="@Icons.Material.Filled.AttachMoney"
-                                                     AdornmentColor="Color.Success"
-                                                     Max="@model.AmountDue" Min="0" Margin="Margin.Dense"
-                                                     Class="flex-row-reverse flex-grow-1 gap-4"
-                                                     @bind-Value="@model.Deposit"
-                                                     HideSpinButtons="true" />
-                                }
-                            </div>
-                            </MudListItem>
-                        <MudDivider />
-                    </MudList>
-                    <div class="mt-auto">
-                        <MudDivider />
-                        <div class="d-flex pa-4">
-                            <MudText>Total a Pagar:</MudText>
-                            <MudText Class="ml-auto"><b>@model.AmountDue.ToString("C2")</b></MudText>
-                        </div>
-                    </div>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" style="text-align:center">
+                                        <MudChip Color="Color.Primary" Label="true" Variant="Variant.Text">Venta sin detalle</MudChip>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4"><MudText Typo="Typo.subtitle1">Subtotal</MudText></td>
+                                <td><MudText Typo="Typo.h6">@model.Subtotal.ToString("C2")</MudText></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4"><MudText Typo="Typo.subtitle1">Descuento</MudText></td>
+                                <td><MudText Typo="Typo.h6">@model.Discount.ToString("C2")</MudText></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4"><MudText Typo="Typo.subtitle1">Total</MudText></td>
+                                <td><MudText Typo="Typo.h6">@model.AmountDue.ToString("C2")</MudText></td>
+                            </tr>
+                        </tfoot>
+                    </MudSimpleTable>
                 </MudPaper>
             </MudItem>
         </MudGrid>
@@ -179,44 +124,39 @@
         new BreadcrumbItem("Ventas", href: null, disabled: true),
         new BreadcrumbItem("Registrar", href: "/ventas/registrar"),
     };
-    private bool dense = false;
-    private bool hover = true;
-    private bool ronly = false;
-    private bool canCancelEdit = false;
-    private bool blockSwitch = false;
-    private string searchString = "";
-    private InvoiceDto model = new();
-    private InvoiceDetailDto selectedItem1 = null;
-    private InvoiceDetailDto elementBeforeEdit;
-    private HashSet<InvoiceDetailDto> selectedItems1 = new HashSet<InvoiceDetailDto>();
-    private TableApplyButtonPosition applyButtonPosition = TableApplyButtonPosition.End;
-    private TableEditButtonPosition editButtonPosition = TableEditButtonPosition.End;
-    private TableEditTrigger editTrigger = TableEditTrigger.RowClick;
-    CustomerResponse _selectedCustomer;
-    ServiceResponse _selectedService;
-    private bool registerDeposit = false;
+    [Inject] ISnackbar Snackbar { get; set; }
 
-    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => value.Length > 2 ? await _customerService.GetCustomersActiveByName(value) : new List<CustomerResponse>();
+    ServiceResponse _selectedService = null;
+    private InvoiceDto model = new();
+    private PaginatedResult<ServiceResponse> Services = new PaginatedResult<ServiceResponse>
+    {
+        PageNumber = 1,
+        PageSize = 30,
+        Results = new(),
+        TotalRecords = 0
+    };
+
+    private int PageNumber = 1;
+    private int PageSize = 30;
+    private int PageSelected = 1;
+    //private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => value.Length > 2 ? await _customerService.GetCustomersActiveByName(value) : new List<CustomerResponse>();
     private async Task<IEnumerable<ServiceResponse>> SearchServiceAsync(string value) => value.Length > 2 ? await _companyServiceService.GetServicesActiveByName(value) : new List<ServiceResponse>();
 
-    private void BackupItem(object element)
+    protected override async Task OnInitializedAsync()
     {
-        elementBeforeEdit = new()
+        try
         {
-            Description = ((InvoiceDetailDto)element).Description,
-            Quantity = ((InvoiceDetailDto)element).Quantity,
-            Rate = ((InvoiceDetailDto)element).Rate,
-            PackageId = ((InvoiceDetailDto)element).PackageId
-        };
+            Services = await _companyServiceService.GetAllServices(PageSize, PageNumber, 1);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Ocurrio un error al recuperar la informacion del cliente.", MudBlazor.Severity.Error);
+        }
     }
 
-    private void ResetItemToOriginalValues(object element)
-    {
-        ((InvoiceDetailDto)element).Description = elementBeforeEdit.Description;
-        ((InvoiceDetailDto)element).Quantity = elementBeforeEdit.Quantity;
-        ((InvoiceDetailDto)element).Rate = elementBeforeEdit.Rate;
-        ((InvoiceDetailDto)element).PackageId = elementBeforeEdit.PackageId;
-    }
+
+    private async Task PageChanged(int i) => Services = await _companyServiceService.GetAllServices(PageSize, i, 1);
+
 
     private void AddToList()
     {
@@ -243,9 +183,30 @@
         _selectedService = null;
     }
 
-    private void RemoveFromList(InvoiceDetailDto line)
+    private void AddToList(ServiceResponse item)
     {
-        Console.WriteLine(line);
-        model.Items.Remove(line);
+        var line = new InvoiceDetailDto()
+        {
+            Id = Guid.Parse(item.Id),
+            Description = item.Name,
+            Quantity = 1,
+            Rate = item.Rate
+        };
+
+        if (model.Items.Count > 0 && model.Items.Any(s => s.Id == line.Id))
+        {
+            model.Items
+              .Where(w => w.Id == line.Id)
+              .ToList()
+              .ForEach(i => i.Quantity++);
+        }
+        else
+        {
+            model.Items.Add(line);
+        }
+
+        _selectedService = null;
     }
+
+    private void RemoveFromList(InvoiceDetailDto line) => model.Items.Remove(line);
 }

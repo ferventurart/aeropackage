@@ -29,8 +29,9 @@ public class CompanyServicesService : ICompanyServicesService
             throw new ApplicationException($"Reason: {response.ReasonPhrase}, Message: {content}");
 
         var services = JsonSerializer.Deserialize<PaginatedResult<ServiceResponse>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-        return services;
+        if (services is not null)
+            return services;
+        return new PaginatedResult<ServiceResponse>();
     }
 
 
@@ -44,7 +45,9 @@ public class CompanyServicesService : ICompanyServicesService
 
         var services = JsonSerializer.Deserialize<List<ServiceResponse>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        return services;
+        if (services is not null)
+            return services;
+        return new List<ServiceResponse>();
     }
 
     public async Task<ServiceResponse> Create(CreateServiceDto service)
@@ -57,7 +60,10 @@ public class CompanyServicesService : ICompanyServicesService
 
         var serviceResponse = JsonSerializer.Deserialize<ServiceResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        return serviceResponse;
+        if (serviceResponse is not null)
+            return serviceResponse;
+
+        return new ServiceResponse(string.Empty, string.Empty, 0, 0);
     }
 
     public async Task<ServiceResponse> Update(UpdateServiceDto service)
@@ -70,7 +76,10 @@ public class CompanyServicesService : ICompanyServicesService
 
         var serviceResponse = JsonSerializer.Deserialize<ServiceResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        return serviceResponse;
+        if (serviceResponse is not null)
+            return serviceResponse;
+
+        return new ServiceResponse(string.Empty, string.Empty, 0, 0);
     }
 
     public async Task<ServiceResponse> Delete(Guid Id)
@@ -83,7 +92,10 @@ public class CompanyServicesService : ICompanyServicesService
 
         var serviceResponse = JsonSerializer.Deserialize<ServiceResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        return serviceResponse;
+        if (serviceResponse is not null)
+            return serviceResponse;
+
+        return new ServiceResponse(string.Empty, string.Empty, 0, 0);
     }
 
     public async Task<ServiceResponse> GetById(Guid Id)
@@ -92,14 +104,17 @@ public class CompanyServicesService : ICompanyServicesService
         var content = await response.Content.ReadAsStringAsync();
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return null;
+            return new ServiceResponse(string.Empty, string.Empty, 0, 0);
 
         if (!response.IsSuccessStatusCode)
             throw new ApplicationException($"Reason: {response.ReasonPhrase}, Message: {content}");
 
         var service = JsonSerializer.Deserialize<ServiceResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        return service;
+        if (service is not null)
+            return service;
+
+        return new ServiceResponse(string.Empty, string.Empty, 0, 0);
     }
 }
 
