@@ -41,7 +41,6 @@
                                          ToStringFunc="@(customer => customer == null ? null : $"{customer.FirstName} {customer.LastName}")"
                                          Immediate="true"
                                          Required="true"
-                                         CoerceValue="true"
                                          RequiredError="Seleccione un cliente del listado"
                                          Placeholder="Buscar cliente por nombre"
                                          Class="mt-3" />
@@ -366,7 +365,7 @@
         return courier;
     }
 
-    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => await _customerService.GetCustomersActiveByName(value);
+    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => value.Length > 2 ? await _customerService.GetCustomersActiveByName(value) : new List<CustomerResponse>();
 
     private async Task<IEnumerable<CommonStore>> SearchStoreAsync(string value) => _commonStores.Where(s => s.Name.ToLower().Contains(value.ToLower())).ToList();
 

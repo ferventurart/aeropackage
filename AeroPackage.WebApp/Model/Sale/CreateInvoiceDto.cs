@@ -14,7 +14,7 @@ public class InvoiceDto
     public decimal Tax { get; set; }
     public decimal Deposit { get; set; }
     public decimal AmountDue => Subtotal - Discount - Deposit;
-    public List<InvoiceDetailDto> Items { get; set; }
+    public List<InvoiceDetailDto> Items = new();
 
 }
 

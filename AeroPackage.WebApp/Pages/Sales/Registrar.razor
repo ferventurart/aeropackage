@@ -1,8 +1,10 @@
 ﻿@using AeroPackage.Contracts.Customer;
+@using AeroPackage.Contracts.Service;
 @using AeroPackage.Contracts.Sale;
 @using AeroPackage.WebApp.Model.Sale;
 @using System.Globalization;
 @inject ICustomerService _customerService;
+@inject ICompanyServicesService _companyServiceService;
 @inject IPackageService _packageService;
 @attribute [Authorize(Roles = "Admin,Executive")]
 @page "/ventas/registrar"
@@ -13,23 +15,24 @@
             <MudItem xs="8" sm="8">
                 <MudPaper Class="d-flex flex-column pa-4" Elevation="3">
                     <MudGrid>
-                        <MudItem xs="12">
-                            <MudAutocomplete T="CustomerResponse"
+                        <MudItem xs="10">
+                            <MudAutocomplete T="ServiceResponse"
                                              Label="Servicios"
-                                             @bind-Value="_selectedCustomer"
-                                             SearchFunc="@SearchCustomerAsync"
+                                             @bind-Value="_selectedService"
+                                             SearchFunc="@SearchServiceAsync"
                                              AdornmentIcon="@Icons.Material.Filled.Search"
                                              AdornmentColor="Color.Primary"
                                              ShowProgressIndicator="true"
                                              ProgressIndicatorColor="Color.Primary"
-                                             ToStringFunc="@(customer => customer == null ? null : $"{customer.FirstName} {customer.LastName}")"
-                                             Immediate="true"
+                                             ToStringFunc="@(service => service == null ? null : $"{service.Name} - Precio: {service.Rate.ToString("C2")}")"
                                              Required="true"
-                                             CoerceValue="true"
                                              Variant="Variant.Outlined"
                                              RequiredError="Seleccione un servicio del listado"
                                              Placeholder="Servicio a Facturar"
                                              Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddToList" Class="mt-1"></MudIconButton>
                         </MudItem>
                     </MudGrid>
                 </MudPaper>
@@ -39,7 +42,7 @@
                             <MudTable Items="@model.Items" Dense="@dense" Hover="@hover" ReadOnly="@ronly" CanCancelEdit="@canCancelEdit"
                                       @bind-SelectedItem="selectedItem1" SortLabel="Sort By" CommitEditTooltip="Guardar Cambio"
                                       RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
-                                      RowEditCommit="ItemHasBeenCommitted" IsEditRowSwitchingBlocked="true"
+                                      IsEditRowSwitchingBlocked="true"
                                       HeaderClass="mud-theme-primary">
                                 <HeaderContent>
                                     <MudTh Style="color:white;">Item</MudTh>
@@ -55,7 +58,7 @@
                                     <MudTd DataLabel="Cant.">@SaleDetail.Quantity</MudTd>
                                     <MudTd DataLabel="Cant.">@SaleDetail.Discount.ToString("C2")</MudTd>
                                     <MudTd DataLabel="Subtotal">@SaleDetail.LineTotal.ToString("C2")</MudTd>
-                                    <MudTd DataLabel="Borrar"><MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"></MudIconButton></MudTd>
+                                    <MudTd DataLabel="Borrar"><MudIconButton OnClick="(() => RemoveFromList(SaleDetail))" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"></MudIconButton></MudTd>
                                 </RowTemplate>
                                 <RowEditingTemplate Context="SaleDetail">
                                     <MudTd DataLabel="Item">@SaleDetail.Description</MudTd>
@@ -67,7 +70,7 @@
                                         <MudNumericField HideSpinButtons="true" Max="@(SaleDetail.Quantity * SaleDetail.Rate)" Margin="Margin.Dense" @bind-Value="@SaleDetail.Discount" Required />
                                     </MudTd>
                                     <MudTd DataLabel="Subtotal">@SaleDetail.LineTotal.ToString("C2")</MudTd>
-                                    <MudTd DataLabel="Borrar"><MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"></MudIconButton></MudTd>
+                                    <MudTd DataLabel="Borrar"><MudIconButton OnClick="(() => RemoveFromList(SaleDetail))" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"></MudIconButton></MudTd>
                                 </RowEditingTemplate>
                                 <EditButtonContent Context="button">
                                     <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
@@ -91,7 +94,6 @@
                                                  ToStringFunc="@(customer => customer == null ? null : $"{customer.FirstName} {customer.LastName}")"
                                                  Immediate="true"
                                                  Required="true"
-                                                 CoerceValue="true"
                                                  Variant="Variant.Outlined"
                                                  RequiredError="Seleccione un cliente del listado"
                                                  Placeholder="Buscar cliente por nombre"
@@ -105,6 +107,7 @@
                             </MudItem>
                             <MudItem xs="12" Class="d-flex justify-center">
                                 <div class="d-flex">
+                                    <MudSwitch @bind-Checked="@registerDeposit" Label="Registrar Deposito" Color="Color.Success" ThumbIcon="@Icons.Material.Filled.AttachMoney"></MudSwitch>
                                     <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Pause" Color="Color.Warning" Class="ml-2">Pausar</MudButton>
                                 </div>
                             </MudItem>
@@ -131,11 +134,27 @@
                         <MudDivider />
                         <MudListItem>
                             <div class="d-flex">
-                                <MudNumericField Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" AdornmentColor="Color.Success" 
-                                 Label="Deposito" Max="@model.AmountDue" Min="0" Margin="Margin.Dense" @bind-Value="@model.Deposit"
-                                 HideSpinButtons="true" />
+                                <MudText>Deposito</MudText>
+                                @if (!registerDeposit)
+                                {
+
+                                    <MudText Inline="true" Class="ml-auto" Typo="Typo.h5">@model.Deposit.ToString("C2")</MudText>
+
+                                }
+                                else
+                                {
+                                    <MudNumericField Clearable="true"
+                                                     Adornment="Adornment.Start"
+                                                     AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                                                     AdornmentColor="Color.Success"
+                                                     Max="@model.AmountDue" Min="0" Margin="Margin.Dense"
+                                                     Class="flex-row-reverse flex-grow-1 gap-4"
+                                                     @bind-Value="@model.Deposit"
+                                                     HideSpinButtons="true" />
+                                }
                             </div>
-                        </MudListItem>
+                            </MudListItem>
+                        <MudDivider />
                     </MudList>
                     <div class="mt-auto">
                         <MudDivider />
@@ -166,26 +185,7 @@
     private bool canCancelEdit = false;
     private bool blockSwitch = false;
     private string searchString = "";
-    private InvoiceDto model = new()
-    {
-        Items = new List<InvoiceDetailDto>()
-        {
-            new InvoiceDetailDto()
-            {
-                Id = Guid.NewGuid(),
-                Description = "Flete de Importacion",
-                Quantity = 1,
-                Rate = 12.99m
-            },
-            new InvoiceDetailDto()
-            {
-                Id = Guid.NewGuid(),
-                Description = "Seguro",
-                Quantity = 1,
-                Rate = 2.99m
-            },
-        }
-    };
+    private InvoiceDto model = new();
     private InvoiceDetailDto selectedItem1 = null;
     private InvoiceDetailDto elementBeforeEdit;
     private HashSet<InvoiceDetailDto> selectedItems1 = new HashSet<InvoiceDetailDto>();
@@ -193,10 +193,11 @@
     private TableEditButtonPosition editButtonPosition = TableEditButtonPosition.End;
     private TableEditTrigger editTrigger = TableEditTrigger.RowClick;
     CustomerResponse _selectedCustomer;
+    ServiceResponse _selectedService;
+    private bool registerDeposit = false;
 
-
-    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => await _customerService.GetCustomersActiveByName(value);
-
+    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => value.Length > 2 ? await _customerService.GetCustomersActiveByName(value) : new List<CustomerResponse>();
+    private async Task<IEnumerable<ServiceResponse>> SearchServiceAsync(string value) => value.Length > 2 ? await _companyServiceService.GetServicesActiveByName(value) : new List<ServiceResponse>();
 
     private void BackupItem(object element)
     {
@@ -217,8 +218,34 @@
         ((InvoiceDetailDto)element).PackageId = elementBeforeEdit.PackageId;
     }
 
-    private void ItemHasBeenCommitted(object element)
+    private void AddToList()
     {
+        var line = new InvoiceDetailDto()
+        {
+            Id = Guid.Parse(_selectedService.Id),
+            Description = _selectedService.Name,
+            Quantity = 1,
+            Rate = _selectedService.Rate
+        };
 
+        if (model.Items.Count > 0 && model.Items.Any(s => s.Id == line.Id))
+        {
+            model.Items
+              .Where(w => w.Id == line.Id)
+              .ToList()
+              .ForEach(i => i.Quantity++);
+        }
+        else
+        {
+            model.Items.Add(line);
+        }
+
+        _selectedService = null;
+    }
+
+    private void RemoveFromList(InvoiceDetailDto line)
+    {
+        Console.WriteLine(line);
+        model.Items.Remove(line);
     }
 }
