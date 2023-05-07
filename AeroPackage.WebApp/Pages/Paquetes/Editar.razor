@@ -43,7 +43,8 @@
                                          Required="true"
                                          RequiredError="Seleccione un cliente del listado"
                                          Placeholder="Buscar cliente por nombre"
-                                         Class="mt-3" />
+                                         Class="mt-3"
+                                         MinCharacters="3"/>
                         <MudAutocomplete T="CommonStore"
                                          Label="Tienda de Origen"
                                          @bind-Value="_selectedStore"
@@ -57,7 +58,8 @@
                                          RequiredError="Seleccione una tienda del listado"
                                          Placeholder="Buscar tienda por nombre"
                                          ToStringFunc="@(store => store == null ? null : $"{store.Name}")"
-                                         Class="mt-3">
+                                         Class="mt-3"
+                                         MinCharacters="3">
 
                             <ItemTemplate Context="e">
                                 <MudGrid>
@@ -367,7 +369,7 @@
         return courier;
     }
 
-    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => value.Length > 2 ? await _customerService.GetCustomersActiveByName(value) : new List<CustomerResponse>();
+    private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => await _customerService.GetCustomersActiveByName(value);
 
     private async Task<IEnumerable<CommonStore>> SearchStoreAsync(string value) => _commonStores.Where(s => s.Name.ToLower().Contains(value.ToLower())).ToList();
 

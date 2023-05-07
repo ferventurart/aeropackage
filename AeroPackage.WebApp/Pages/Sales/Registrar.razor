@@ -8,6 +8,11 @@
 @inject IPackageService _packageService;
 @attribute [Authorize(Roles = "Admin,Executive")]
 @page "/ventas/registrar"
+<style>
+    .custom-header-class {
+        background-color: #594AE2
+    }
+</style>
 <AuthorizeView>
     <Authorized>
         <MudGrid Spacing="2">
@@ -19,7 +24,7 @@
                                              Label="Servicios"
                                              @bind-Value="_selectedService"
                                              SearchFunc="@SearchServiceAsync"
-                                             AdornmentIcon="@Icons.Material.Filled.Search"
+                                             AdornmentIcon="@Icons.Material.Filled.Add"
                                              AdornmentColor="Color.Primary"
                                              ShowProgressIndicator="true"
                                              ProgressIndicatorColor="Color.Primary"
@@ -29,7 +34,8 @@
                                              RequiredError="Seleccione un servicio del listado"
                                              Placeholder="Servicio a Facturar"
                                              Margin="Margin.Dense"
-                                             Clearable="true" />
+                                             MinCharacters="3"
+                                             OnAdornmentClick="AddToList" />
 
                         </MudItem>
                     </MudGrid>
@@ -55,59 +61,48 @@
             </MudItem>
             <MudItem xs="12" sm="5" md="5" lg="5">
                 <MudPaper Class="d-flex flex-column" Elevation="2">
-                    <MudSimpleTable Hover="true" Dense="true" Class="mud-table-sticky-footer" FixedHeader="true" Style="height:117vh;">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Item</th>
-                                <th>Cant.</th>
-                                <th>Precio</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (model.Items.Count > 0)
-                            {
-                                @foreach (var item in model.Items)
-                                {
-                                    <tr>
-                                        <td>
-                                            <MudIconButton Variant="Variant.Text"
-                                                           Size="Size.Small" Color="Color.Error"
-                                                           Icon="@Icons.Material.Filled.Delete"
-                                                           OnClick="(() => RemoveFromList(item))" />
-                                        </td>
-                                        <td>@item.Description</td>
-                                        <td>@item.Quantity</td>
-                                        <td>@item.Rate.ToString("C2")</td>
-                                        <td>@item.LineTotal.ToString("C2")</td>
-                                    </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="5" style="text-align:center">
-                                        <MudChip Color="Color.Primary" Label="true" Variant="Variant.Text">Venta sin detalle</MudChip>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="4"><MudText Typo="Typo.subtitle1">Subtotal</MudText></td>
-                                <td><MudText Typo="Typo.h6">@model.Subtotal.ToString("C2")</MudText></td>
-                            </tr>
-                            <tr>
-                                <td colspan="4"><MudText Typo="Typo.subtitle1">Descuento</MudText></td>
-                                <td><MudText Typo="Typo.h6">@model.Discount.ToString("C2")</MudText></td>
-                            </tr>
-                            <tr>
-                                <td colspan="4"><MudText Typo="Typo.subtitle1">Total</MudText></td>
-                                <td><MudText Typo="Typo.h6">@model.AmountDue.ToString("C2")</MudText></td>
-                            </tr>
-                        </tfoot>
-                    </MudSimpleTable>
+                    <MudTable T="InvoiceDetailDto"
+                              Items="@model.Items"
+                              Height="117vh"
+                              Striped="true"
+                              CustomHeader="true"
+                              CustomFooter="true"
+                              FixedHeader="true" FixedFooter="true"
+                              HeaderClass="custom-header-class">
+                        <HeaderContent>
+                            <MudTh></MudTh>
+                            <MudTh Style="color: white">Item</MudTh>
+                            <MudTh Style="color: white">Cant.</MudTh>
+                            <MudTh Style="color: white">Precio</MudTh>
+                            <MudTh Style="color: white">Subtotal</MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="SaleDetail">
+                            <MudTd>
+                                <MudIconButton Variant="Variant.Text"
+                                               Size="Size.Small" Color="Color.Error"
+                                               Icon="@Icons.Material.Filled.Delete"
+                                               OnClick="(() => RemoveFromList(SaleDetail))" />
+                            </MudTd>
+                            <MudTd DataLabel="Item">@SaleDetail.Description</MudTd>
+                            <MudTd DataLabel="Cant.">@SaleDetail.Quantity</MudTd>
+                            <MudTd DataLabel="Precio">@SaleDetail.Rate.ToString("C2")</MudTd>
+                            <MudTd DataLabel="Subtotal">@SaleDetail.LineTotal.ToString("C2")</MudTd>
+                        </RowTemplate>
+                        <FooterContent>
+                            <MudTFootRow IsCheckable="true">
+                                <MudTd colspan="4"><MudText Typo="Typo.subtitle1">Subtotal</MudText></MudTd>
+                                <MudTd><MudText Typo="Typo.h5">@model.Subtotal.ToString("C2")</MudText></MudTd>
+                            </MudTFootRow>
+                            <MudTFootRow IsCheckable="true">
+                                <MudTd colspan="4"><MudText Typo="Typo.subtitle1">Descuento</MudText></MudTd>
+                                <MudTd><MudText Typo="Typo.h5">@model.Discount.ToString("C2")</MudText></MudTd>
+                            </MudTFootRow>
+                            <MudTFootRow IsCheckable="true">
+                                <MudTd colspan="4"><MudText Typo="Typo.subtitle1">Total</MudText></MudTd>
+                                <MudTd><MudText Typo="Typo.h5">@model.AmountDue.ToString("C2")</MudText></MudTd>
+                            </MudTFootRow>
+                        </FooterContent>
+                    </MudTable>
                 </MudPaper>
             </MudItem>
         </MudGrid>
@@ -139,8 +134,8 @@
     private int PageNumber = 1;
     private int PageSize = 30;
     private int PageSelected = 1;
-    //private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => value.Length > 2 ? await _customerService.GetCustomersActiveByName(value) : new List<CustomerResponse>();
-    private async Task<IEnumerable<ServiceResponse>> SearchServiceAsync(string value) => value.Length > 2 ? await _companyServiceService.GetServicesActiveByName(value) : new List<ServiceResponse>();
+    //private async Task<IEnumerable<CustomerResponse>> SearchCustomerAsync(string value) => await _customerService.GetCustomersActiveByName(value);
+    private async Task<IEnumerable<ServiceResponse>> SearchServiceAsync(string value) => await _companyServiceService.GetServicesActiveByName(value);
 
     protected override async Task OnInitializedAsync()
     {
@@ -209,4 +204,16 @@
     }
 
     private void RemoveFromList(InvoiceDetailDto line) => model.Items.Remove(line);
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Snackbar.Add("QUE VIVA EL SEXO", Severity.Info);
+        }
+        else
+        {
+            //
+        }
+    }
 }
